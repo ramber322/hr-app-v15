@@ -1,16 +1,23 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { supabase } from "../lib/supabase";
 import { DocumentListIcon, NewspaperIcon } from "../components/icons/CustomIcons";
 import Loader from '../components/Loader';
 
 export default function CandidatesPage() {
+  
   const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+  
+  // 🆕 Read status from URL param (fallback to "All")
+  const initialStatus = searchParams.get("status") || "All";
+
+
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("All");
+  const [filterStatus, setFilterStatus] = useState(initialStatus);  // ← changed
   const [filterDepartment, setFilterDepartment] = useState("All");
   const [departments, setDepartments] = useState([]);
 
@@ -434,7 +441,7 @@ export default function CandidatesPage() {
   marginLeft: '-20px'
 }}>
   
-  <NewspaperIcon size={33} color="#4F46E5" /> 
+  <NewspaperIcon size={33} color="#1a3a5c" /> 
   Applications
 </h1>
           <p>View and manage all job applications across all postings</p>

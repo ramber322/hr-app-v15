@@ -1720,3 +1720,84 @@ export function CalendarBookMarkIcon({ size = 24, className = "", color = "curre
     </svg>
   );
 }
+
+
+export function BasiconsBriefcaseIcon({ size = 24, className = "", color = "currentColor", style = {} }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      style={{ color, flexShrink: 0, ...style }}
+    >
+      <path
+        d="M16 7V4C16 2.89543 15.1046 2 14 2H10C8.89543 2 8 2.89543 8 4V7M22 12L12.3922 13.9216C12.1333 13.9733 11.8667 13.9733 11.6078 13.9216L2 12M4 22H20C21.1046 22 22 21.1046 22 20V9C22 7.89543 21.1046 7 20 7H4C2.89543 7 2 7.89543 2 9V20C2 21.1046 2.89543 22 4 22Z"
+        stroke={color}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function BasiconsInterviewIcon({ size = 24, className = "", color = "currentColor", style = {} }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      style={{ color, flexShrink: 0, ...style }}
+    >
+      <path
+        d="M2 5L5.72361 6.8618C5.893 6.9465 6 7.11963 6 7.30902V16.691C6 16.8804 5.893 17.0535 5.72361 17.1382L2 19V5Z"
+        stroke={color}
+        strokeWidth="1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M22 5L18.2764 6.8618C18.107 6.9465 18 7.11963 18 7.30902V16.691C18 16.8804 18.107 17.0535 18.2764 17.1382L22 19V5Z"
+        stroke={color}
+        strokeWidth="1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9 9.5C9 9.22386 9.22386 9 9.5 9H14.5C14.7761 9 15 9.22386 15 9.5V14.5C15 14.7761 14.7761 15 14.5 15H9.5C9.22386 15 9 14.7761 9 14.5V9.5Z"
+        stroke={color}
+        strokeWidth="1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function BasiconsInstructionsIcon({ size = 24, className = "", color = "currentColor", style = {} }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      style={{ color, flexShrink: 0, ...style }}
+    >
+      <path
+        d="M20 12V4C20 2.89543 19.1046 2 18 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V18.5M13 2V14L16.8182 11L20 14V5"
+        stroke={color}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}

@@ -1,865 +1,654 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { supabase } from "../lib/supabase";
+import Loader from "../components/Loader";
 import "../styles/DashboardPage.css";
-import {ClockIcon, DocumentListDashboardIcon,  GraphChartIcon, ConfettiIcon, BriefcaseIcon } from "../components/icons/CustomIcons";
-import calendarminimalLogo from '../assets/calendar-minimal-icon.png';
-import documentplumpLogo from '../assets/document-plump-dashboard-icon.png';
-import openjobLogo from '../assets/open-job-icon.png';
-import Loader from '../components/Loader';
-// Chart.js importss
+import {  BasiconsBriefcaseIcon, BasiconsInterviewIcon, CheckIcon } from "../components/icons/CustomIcons";
+
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
-  BarElement,
-  Title,
   Tooltip,
   Legend,
-  ArcElement,
   Filler,
-} from 'chart.js';
-import { Line, Bar, Doughnut } from 'react-chartjs-2';
+} from "chart.js";
+import { Line } from "react-chartjs-2";
 
-// Register Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
-  BarElement,
-  Title,
   Tooltip,
   Legend,
-  ArcElement,
   Filler
 );
 
+const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+const STATUS_META = {
+  PENDING: { label: "Pending", tone: "amber" },
+  REVIEWING: { label: "Under review", tone: "blue" },
+  QUALIFIED: { label: "Qualified", tone: "violet" },
+  SHORTLISTED: { label: "Shortlisted", tone: "violet" },
+  FOR_INTERVIEW: { label: "For interview", tone: "teal" },
+  INTERVIEW_SCHEDULED: { label: "Interview scheduled", tone: "teal" },
+  HIRED: { label: "Hired", tone: "green" },
+  NOT_SELECTED: { label: "Not selected", tone: "rose" },
+  REJECTED: { label: "Rejected", tone: "rose" },
+};
+
+const isShortlisted = (status) =>
+  ["QUALIFIED", "SHORTLISTED", "FOR_INTERVIEW", "INTERVIEW_SCHEDULED"].includes(status);
+
+const isRejected = (status) => ["NOT_SELECTED", "REJECTED", "WITHDRAWN"].includes(status);
+
+function formatRelativeDate(value) {
+  if (!value) return "Date unavailable";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Date unavailable";
+
+  const days = Math.floor((Date.now() - date.getTime()) / 86400000);
+  if (days <= 0) return "Today";
+  if (days === 1) return "Yesterday";
+  if (days < 7) return `${days} days ago`;
+  return date.toLocaleDateString("en-PH", { month: "short", day: "numeric" });
+}
+
+function formatDate(value) {
+  if (!value) return "Date unavailable";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Date unavailable";
+  return date.toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" });
+}
+
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+}
+
+function getInitials(value = "") {
+  return value
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join("") || "A";
+}
+
 export default function DashboardPage() {
   const navigate = useNavigate();
+
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    totalJobs: 0,
-    totalApplicants: 0,
-    totalHired: 0,
-    openJobs: 0,
-  });
-  const [applicantsByStatus, setApplicantsByStatus] = useState({});
-  const [recentActivity, setRecentActivity] = useState([]);
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [calendarDays, setCalendarDays] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [jobs, setJobs] = useState([]);
+  const [applications, setApplications] = useState([]);
+  const [loadError, setLoadError] = useState("");
 
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
+  const loadDashboardData = async (showRefresh = false) => {
+    if (showRefresh) setRefreshing(true);
+    else setLoading(true);
 
-  const loadDashboardData = async () => {
-    setLoading(true);
+    setLoadError("");
+
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError) throw userError;
       if (!user) {
-        navigate('/login');
+        navigate("/login");
         return;
       }
 
-      const { data: jobs, error: jobsError } = await supabase
-        .from('job_postings')
-        .select('*');
+      const [
+        { data: jobRows, error: jobsError },
+        { data: applicationRows, error: applicationsError },
+      ] = await Promise.all([
+        supabase.from("job_postings").select("*"),
+        supabase
+          .from("applications")
+          .select("*, job_postings(position_title)")
+          .neq("status", "WITHDRAWN"),
+      ]);
 
       if (jobsError) throw jobsError;
+      if (applicationsError) throw applicationsError;
 
-      const totalJobs = jobs.length;
-      const openJobs = jobs.filter(j => j.status === 'OPEN').length;
-
-      const { data: applications, error: appsError } = await supabase
-        .from('applications')
-        .select('*, job_postings(position_title)')
-        .neq('status', 'WITHDRAWN');
-
-      if (appsError) throw appsError;
-
-      const totalApplicants = applications.length;
-      const hired = applications.filter(a => a.status === 'HIRED').length;
-
-      const statusGroups = {
-        'Pending': 0,
-        'Under Review': 0,
-        'Shortlisted': 0,
-        'Rejected': 0,
-      };
-
-      applications.forEach(app => {
-        const status = app.status;
-        if (status === 'PENDING') {
-          statusGroups['Pending']++;
-        } else if (status === 'REVIEWING') {
-          statusGroups['Under Review']++;
-        } else if (['QUALIFIED', 'SHORTLISTED', 'FOR_INTERVIEW', 'INTERVIEW_SCHEDULED', 'HIRED'].includes(status)) {
-          statusGroups['Shortlisted']++;
-        } else if (['NOT_SELECTED', 'REJECTED'].includes(status)) {
-          statusGroups['Rejected']++;
-        }
-      });
-
-      setApplicantsByStatus(statusGroups);
-
-      setStats({
-        totalJobs,
-        totalApplicants,
-        totalHired: hired,
-        openJobs,
-      });
-
-      const sortedApps = [...applications].sort((a, b) => 
-        new Date(b.applied_date) - new Date(a.applied_date)
-      ).slice(0, 10);
-
-      const activity = sortedApps.map(app => ({
-        id: app.id,
-        type: 'application',
-        message: `New application received for ${app.job_postings?.position_title || 'a position'}`,
-        time: app.applied_date,
-        link: `/hr/jobs/${app.job_id}/candidates`
-      }));
-      setRecentActivity(activity);
-
-      buildCalendar(currentMonth);
-
+      setJobs(jobRows || []);
+      setApplications(applicationRows || []);
     } catch (error) {
-      console.error('Error loading dashboard:', error);
+      console.error("Error loading dashboard:", error);
+      setLoadError("We couldn't load the dashboard data. Please try refreshing.");
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
-  const buildCalendar = (date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const daysInPrevMonth = new Date(year, month, 0).getDate();
-    
-    const days = [];
-    
-    for (let i = firstDay - 1; i >= 0; i--) {
-      days.push({
-        day: daysInPrevMonth - i,
-        isCurrentMonth: false,
-      });
-    }
-    
-    for (let i = 1; i <= daysInMonth; i++) {
-      days.push({
-        day: i,
-        isCurrentMonth: true,
-      });
-    }
-    
-    const remaining = 42 - days.length;
-    for (let i = 1; i <= remaining; i++) {
-      days.push({
-        day: i,
-        isCurrentMonth: false,
-      });
-    }
-    
-    setCalendarDays(days);
+  useEffect(() => {
+    loadDashboardData();
+    // Load once when the dashboard mounts.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+ const metrics = useMemo(() => {
+  const activeJobs = jobs.filter((job) => job.status === "OPEN");
+  const pending = applications.filter((app) => app.status === "PENDING");
+  const reviewing = applications.filter((app) => app.status === "REVIEWING");
+  const shortlisted = applications.filter((app) => isShortlisted(app.status));
+  const interview = applications.filter((app) => app.status === "INTERVIEW_SCHEDULED" || app.status === "FOR_INTERVIEW");
+  const hired = applications.filter((app) => app.status === "HIRED");
+
+  // 🆕 Jobs closing within 14 days
+  const closingSoon = jobs.filter((job) => {
+    if (job.status !== "OPEN" || !job.closing_date) return false;
+    const daysLeft = Math.ceil(
+      (new Date(job.closing_date) - new Date()) / (1000 * 60 * 60 * 24)
+    );
+    return daysLeft > 0 && daysLeft <= 14;
+  }).length;
+
+  return {
+    totalJobs: jobs.length,
+    openJobs: activeJobs.length,
+    totalApplications: applications.length,
+    pending: pending.length,
+    reviewing: reviewing.length,
+    shortlisted: shortlisted.length,
+    interview: interview.length,
+    hired: hired.length,
+    closingSoon,  // 🆕
   };
+}, [jobs, applications]);
 
-  const changeMonth = (offset) => {
-    const newMonth = new Date(currentMonth);
-    newMonth.setMonth(newMonth.getMonth() + offset);
-    setCurrentMonth(newMonth);
-    buildCalendar(newMonth);
-  };
+  const latestApplications = useMemo(
+    () =>
+      [...applications]
+        .sort((a, b) => new Date(b.applied_date || 0) - new Date(a.applied_date || 0))
+        .slice(0, 6),
+    [applications]
+  );
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diff = now - date;
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const weeks = Math.floor(days / 7);
+  const positionBreakdown = useMemo(() => {
+    const counts = new Map();
 
-    if (hours < 1) return 'Just now';
-    if (hours < 24) return `${hours}h ago`;
-    if (days < 7) return `${days}d ago`;
-    if (weeks < 4) return `${weeks}w ago`;
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  };
+    applications.forEach((application) => {
+      const jobId = application.job_id;
+      if (!jobId) return;
+      const current = counts.get(jobId) || {
+        jobId,
+        title: application.job_postings?.position_title || "Untitled position",
+        count: 0,
+      };
+      current.count += 1;
+      counts.set(jobId, current);
+    });
 
-  // Chart data - Hiring Trends
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const trendsData = {
-    labels: months,
-    datasets: [
-    {
-  label: 'Applied',
-  data: [65, 78, 90, 85, 95, 110, 105, 120, 115, 130, 125, 140],
-  borderColor: '#4f46e5',  // Indigo
-  backgroundColor: 'rgba(79, 70, 229, 0.1)',
-  fill: true,
-  tension: 0.4,
-  pointRadius: 3,
-  pointBackgroundColor: '#4f46e5',
-},
-{
-  label: 'Hired',
-  data: [12, 15, 18, 20, 22, 25, 28, 30, 32, 35, 38, 40],
-  borderColor: '#60a5fa',  // Sky Blue
-  backgroundColor: 'rgba(96, 165, 250, 0.1)',
-  fill: true,
-  tension: 0.4,
-  pointRadius: 3,
-  pointBackgroundColor: '#60a5fa',
-},
-      {
-        label: 'Rejected',
-        data: [20, 25, 30, 28, 32, 35, 30, 40, 38, 42, 45, 48],
-        borderColor: '#ef4444',
-        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-        fill: true,
-        tension: 0.4,
-        pointRadius: 3,
-        pointBackgroundColor: '#ef4444',
-      },
-    ],
-  };
+    return [...counts.values()].sort((a, b) => b.count - a.count).slice(0, 5);
+  }, [applications]);
 
-  const trendsOptions = {
+  const pipeline = useMemo(() => {
+    const stages = [
+      { label: "Pending", count: metrics.pending, color: "#D6A34A" },
+      { label: "Under review", count: metrics.reviewing, color: "#6B91C9" },
+      { label: "Shortlisted", count: metrics.shortlisted, color: "#9279C9" },
+      { label: "Interview", count: metrics.interview, color: "#4D9D91" },
+      { label: "Hired", count: metrics.hired, color: "#5A9A78" },
+    ];
+    const max = Math.max(...stages.map((stage) => stage.count), 1);
+    return stages.map((stage) => ({ ...stage, width: (stage.count / max) * 100 }));
+  }, [metrics]);
+
+  const trendData = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    const monthlyApplications = Array(12).fill(0);
+    const monthlyHires = Array(12).fill(0);
+
+    applications.forEach((application) => {
+      if (!application.applied_date) return;
+      const date = new Date(application.applied_date);
+      if (date.getFullYear() === currentYear) monthlyApplications[date.getMonth()] += 1;
+    });
+
+    // Hired records are grouped by applied_date because no hire-date field
+    // is assumed here. Replace this with the actual hire date field if available.
+    applications.forEach((application) => {
+      if (application.status !== "HIRED" || !application.applied_date) return;
+      const date = new Date(application.applied_date);
+      if (date.getFullYear() === currentYear) monthlyHires[date.getMonth()] += 1;
+    });
+
+    return {
+      labels: MONTH_LABELS,
+      datasets: [
+        {
+          label: "Applications",
+          data: monthlyApplications,
+          borderColor: "#6675A8",
+          backgroundColor: "rgba(102, 117, 168, 0.10)",
+          fill: true,
+          tension: 0.35,
+          pointRadius: 2,
+          pointHoverRadius: 4,
+          pointBackgroundColor: "#6675A8",
+          borderWidth: 2,
+        },
+        {
+          label: "Hired",
+          data: monthlyHires,
+          borderColor: "#5D9B87",
+          backgroundColor: "transparent",
+          fill: false,
+          tension: 0.35,
+          pointRadius: 2,
+          pointHoverRadius: 4,
+          pointBackgroundColor: "#5D9B87",
+          borderWidth: 2,
+        },
+      ],
+    };
+  }, [applications]);
+
+  const trendOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    interaction: { mode: "index", intersect: false },
     plugins: {
       legend: {
-        position: 'top',
+        position: "top",
+        align: "end",
         labels: {
           usePointStyle: true,
-          boxWidth: 8,
-          padding: 15,
+          pointStyle: "circle",
+          boxWidth: 7,
+          boxHeight: 7,
+          padding: 16,
+          color: "#7B8493",
+          font: { size: 10, family: "Inter, sans-serif" },
         },
       },
       tooltip: {
-        backgroundColor: 'white',
-        titleColor: '#1a1f36',
-        bodyColor: '#4a5568',
-        borderColor: '#e9ecef',
-        borderWidth: 1,
-        cornerRadius: 8,
-        padding: 12,
+        backgroundColor: "#252B36",
+        titleColor: "#FFFFFF",
+        bodyColor: "#E8EBF0",
+        padding: 10,
+        cornerRadius: 7,
       },
     },
     scales: {
       y: {
         beginAtZero: true,
-        grid: {
-          color: 'rgba(0,0,0,0.05)',
-        },
-        ticks: {
-          font: {
-            size: 11,
-          },
-        },
+        border: { display: false },
+        grid: { color: "#EEF0F3", drawTicks: false },
+        ticks: { color: "#A0A7B2", padding: 8, precision: 0, font: { size: 10 } },
       },
       x: {
-        grid: {
-          display: false,
-        },
-        ticks: {
-          font: {
-            size: 11,
-          },
-        },
+        border: { display: false },
+        grid: { display: false },
+        ticks: { color: "#A0A7B2", font: { size: 10 } },
       },
     },
   };
 
-  // Status colors
-  const statusColors = {
-    'Pending': { bg: '#FFF3E0', color: '#E65100', barColor: '#FF9800' },
-    'Under Review': { bg: '#E3F2FD', color: '#1565C0', barColor: '#2196F3' },
-    'Shortlisted': { bg: '#E8F5E9', color: '#2E7D32', barColor: '#4CAF50' },
-    'Rejected': { bg: '#FFEBEE', color: '#C62828', barColor: '#F44336' },
-  };
-
-  const statCards = [
- {
-  title: 'Total Jobs',
-  value: stats.totalJobs,
-  change: '+1.4%',
-  icon: BriefcaseIcon,
-  color: '#4f46e5',
-  bgColor: '#eef2ff',
-},
-{
-  title: 'Total Applications',
-  value: stats.totalApplicants,
-  change: '+2.4%',
-  icon: DocumentListDashboardIcon,
-  color: '#f59e0b',
-  bgColor: '#fffbeb',
-},
-{
-  title: 'Total Hired',
-  value: stats.totalHired,
-  change: '+1.2%',
-  icon: ConfettiIcon,
-  color: '#0d9488',
-  bgColor: '#f0fdfa',
-},
-  {
-    title: 'Open Jobs',
-    value: stats.openJobs,
-    change: '-0.8%',
-     icon: openjobLogo,  // ← Use the imported PNG
-    color: '#ef4444',
-    bgColor: '#fde8e8',
-     isImage: true,  // ← Flag to indicate it's an image
-  },
-];
-
-  // Month name for calendar
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-
-  const styles = `
-    .hr-dashboard {
-      padding-top: 80px;
-      padding-left: 24px;
-      padding-right: 24px;
-      background: #f5f6f8;
-      min-height: 100vh;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-
-    .dashboard-header {
-      margin-bottom: 24px;
-    }
-
-    .dashboard-header h1 {
-      margin: 0;
-      font-size: 28px;
-      color: #1a1f36;
-    }
-
-    .dashboard-header p {
-      color: #6c757d;
-      margin-top: 4px;
-      font-size: 14px;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .stat-card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      transition: all 0.3s;
-      text-align: center;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    .stat-card .stat-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 8px auto;
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
-    }
-
-    .stat-card .stat-value {
-      font-size: 28px;
-      font-weight: 700;
-      color: #1a1f36;
-      display: block;
-    }
-
-    .stat-card .stat-title {
-      font-size: 13px;
-      color: #6c757d;
-      display: block;
-      margin-top: 4px;
-    }
-
-    .stat-card .stat-change {
-      font-size: 12px;
-      font-weight: 500;
-      display: inline-block;
-      margin-top: 8px;
-      padding: 2px 10px;
-      border-radius: 12px;
-    }
-
-    .stat-change.positive {
-      color: #10b981;
-      background: #ecfdf5;
-    }
-
-    .stat-change.negative {
-      color: #ef4444;
-      background: #fef2f2;
-    }
-
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 24px;
-      margin-bottom: 24px;
-    }
-
-    .dashboard-card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      overflow: hidden;
-    }
-
-    .dashboard-card .card-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid #e9ecef;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .dashboard-card .card-header h3 {
-      margin: 0;
-      font-size: 16px;
-      color: #1a1f36;
-      font-weight: 600;
-    }
-
-    .dashboard-card .card-body {
-      padding: 20px;
-    }
-
-    .chart-container {
-      height: 280px;
-      position: relative;
-    }
-
-    .status-list {
-      padding: 4px 0;
-    }
-
-    .status-item {
-      margin-bottom: 16px;
-    }
-
-    .status-item:last-child {
-      margin-bottom: 0;
-    }
-
-    .status-item-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-    }
-
-    .status-item-label {
-      font-size: 13px;
-      color: #1a1f36;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .status-item-label .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      display: inline-block;
-    }
-
-    .status-item-value {
-      font-weight: 600;
-      font-size: 14px;
-      color: #1a1f36;
-    }
-
-    .status-progress-bar {
-      width: 100%;
-      height: 8px;
-      background: #e9ecef;
-      border-radius: 4px;
-      overflow: hidden;
-      margin-top: 4px;
-    }
-
-    .status-progress-fill {
-      height: 100%;
-      border-radius: 4px;
-      transition: width 0.6s ease;
-    }
-
-    .status-item-percent {
-      font-size: 12px;
-      color: #6c757d;
-      text-align: right;
-      margin-top: 2px;
-    }
-
-    .status-total {
-      font-size: 13px;
-      color: #6c757d;
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid #e9ecef;
-      text-align: center;
-    }
-
-    .activity-list {
-      max-height: 300px;
-      overflow-y: auto;
-    }
-
-    .activity-item {
-      padding: 12px 0;
-      border-bottom: 1px solid #f0f0f0;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .activity-item:hover {
-      background: #f8f9fa;
-      margin: 0 -20px;
-      padding-left: 20px;
-      padding-right: 20px;
-      border-radius: 6px;
-    }
-
-    .activity-item .activity-message {
-      font-size: 13px;
-      color: #1a1f36;
-    }
-
-    .activity-item .activity-time {
-      font-size: 11px;
-      color: #adb5bd;
-      margin-top: 4px;
-    }
-
-    .activity-empty {
-      text-align: center;
-      padding: 30px 0;
-      color: #6c757d;
-      font-size: 14px;
-    }
-
-    .calendar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-
-    .calendar-header .month-label {
-      font-weight: 600;
-      font-size: 16px;
-      color: #1a1f36;
-    }
-
-    .calendar-nav-btn {
-      background: none;
-      border: none;
-      font-size: 18px;
-      cursor: pointer;
-      padding: 4px 12px;
-      border-radius: 6px;
-      color: #6c757d;
-    }
-
-    .calendar-nav-btn:hover {
-      background: #f3f4f6;
-    }
-
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 4px;
-    }
-
-    .calendar-day-header {
-      text-align: center;
-      font-size: 11px;
-      font-weight: 600;
-      color: #6c757d;
-      padding: 4px 0;
-    }
-
-    .calendar-day {
-      text-align: center;
-      font-size: 13px;
-      padding: 6px 0;
-      border-radius: 6px;
-      color: #1a1f36;
-    }
-
-    .calendar-day.current-month {
-      color: #1a1f36;
-    }
-
-    .calendar-day.other-month {
-      color: #adb5bd;
-    }
-
-    .calendar-day.today {
-      background: #4f46e5;
-      color: white;
-      font-weight: 600;
-    }
-
-    .loading-state {
-      text-align: center;
-      padding: 60px;
-      color: #6c757d;
-    }
-
-    .view-more-btn {
-      font-size: 13px;
-      color: #4f46e5;
-      cursor: pointer;
-      text-decoration: none;
-    }
-
-    .view-more-btn:hover {
-      text-decoration: underline;
-    }
-      .icon-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-    @media (max-width: 1024px) {
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (max-width: 768px) {
-      .hr-dashboard { padding: 16px; padding-top: 80px; }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .dashboard-grid { grid-template-columns: 1fr; }
-      .dashboard-card .card-body { padding: 16px; }
-      .chart-container { height: 220px; }
-    }
-  `;
+  const today = new Date();
+  const greeting = getGreeting();
 
   if (loading) {
     return (
       <>
         <Navbar userRole="hr" />
-        <div className="hr-dashboard">
-          <style>{styles}</style>
-           <Loader />
-           
-        </div>
+        <main className="hr-dashboard">
+          <div className="dashboard-loading"><Loader /></div>
+        </main>
       </>
     );
   }
 
-  const totalApplicants = Object.values(applicantsByStatus).reduce((a, b) => a + b, 0) || 1;
-
   return (
     <>
       <Navbar userRole="hr" />
-      <div className="hr-dashboard">
-        <style>{styles}</style>
 
-        <div className="dashboard-header">
-          <h1>Dashboard Overview</h1>
-          <p>Here's your hiring summary for this month.</p>
-        </div>
+      <main className="hr-dashboard">
+        <div className="dashboard-shell">
+          <header className="dashboard-topbar">
+            <div>
+              <div className="dashboard-kicker">RECRUITMENT WORKSPACE</div>
+              <h1>Dashboard Overview</h1>
+              <p>Here's an overview of your recruitment activity.</p>
+            </div>
 
-        {/* Stats Cards */}
-        <div className="stats-grid">
-          {statCards.map((card, index) => {
-            const IconComponent = card.icon;
-            // Check if the icon is a component or a string (emoji)
-            const isComponent = typeof IconComponent === 'function' || typeof IconComponent === 'object';
-            
-            return (
-              <div key={index} className="stat-card">
-                <div
-                  className="stat-icon"
-                  style={{
-                    background: card.bgColor,
-                    color: card.color,
-                  }}
-                >
-                 {card.isImage ? (
-  <img 
-    src={card.icon} 
-    alt={card.title} 
-    style={{ width: 28, height: 28, filter: 'brightness(0) saturate(100%) invert(23%) sepia(100%) saturate(2500%) hue-rotate(350deg) brightness(90%) contrast(100%)' }} 
-    
-  />
-) : isComponent ? (
-  <IconComponent size={28} />
-) : (
-  <span style={{ fontSize: '20px' }}>{card.icon}</span>
+            <div className="topbar-actions">
+              <div className="today-label">
+                <span className="today-label-dot" />
+                {today.toLocaleDateString("en-PH", {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </div>
+              <button
+                className="refresh-button"
+                type="button"
+                onClick={() => loadDashboardData(true)}
+                disabled={refreshing}
+              >
+                <span className={refreshing ? "refresh-symbol spinning" : "refresh-symbol"}>↻</span>
+                {refreshing ? "Refreshing" : "Refresh"}
+              </button>
+            </div>
+          </header>
+
+          {loadError && (
+            <div className="dashboard-error" role="alert">
+              <span>{loadError}</span>
+              <button type="button" onClick={() => loadDashboardData(true)}>Try again</button>
+            </div>
+          )}
+
+          {/* Compact KPI row: six cards, rather than four oversized tiles. */}
+          <section className="metric-grid" aria-label="Recruitment metrics">
+            <article className="metric-card">
+              <div className="metric-card-heading"><span className="metric-icon slate">▤</span><span>Total applications</span></div>
+              <strong>{metrics.totalApplications}</strong>
+              <small>All submitted applications</small>
+            </article>
+            <article className="metric-card">
+              <div className="metric-card-heading"><span className="metric-icon blue">◷</span><span>Needs review</span></div>
+              <strong>{metrics.pending + metrics.reviewing}</strong>
+              <small>{metrics.pending} pending · {metrics.reviewing} reviewing</small>
+            </article>
+            <article className="metric-card">
+              <div className="metric-card-heading"><span className="metric-icon violet">◇</span><span>Shortlisted</span></div>
+              <strong>{metrics.shortlisted}</strong>
+              <small>Qualified / shortlisted pipeline</small>
+            </article>
+           <article className="metric-card">
+  <div className="metric-card-heading">
+    <span className="metric-icon teal">
+      <BasiconsInterviewIcon size={14} color="currentColor" />
+    </span>
+    <span>Interviews</span>
+  </div>
+  <strong>{metrics.interview}</strong>
+  <small>For interview / scheduled</small>
+</article>
+            <article className="metric-card">
+              <div className="metric-card-heading"><span className="metric-icon green"><CheckIcon size={14} color="currentColor" /></span><span>Hired</span></div>
+              <strong>{metrics.hired}</strong>
+              <small>Marked as hired</small>
+            </article>
+            <article className="metric-card">
+  <div className="metric-card-heading">
+    <span className="metric-icon amber">
+      <BasiconsBriefcaseIcon size={14} color="currentColor" />
+    </span>
+    <span>Open vacancies</span>
+  </div>
+  <strong>{metrics.openJobs}</strong>
+  <small>{metrics.totalJobs} total job postings</small>
+</article>
+          </section>
+
+          {/* Asymmetric layout: wide analytics area and narrow action rail. */}
+          <section className="dashboard-main-layout">
+            <div className="dashboard-primary-column">
+              <article className="panel trend-panel">
+                <div className="panel-header">
+                  <div>
+                    <span className="panel-overline">ACTIVITY</span>
+                    <h2>Hiring trends</h2>
+                    <p>Applications received and applicants marked as hired this year.</p>
+                  </div>
+                  <span className="panel-tag">Current year</span>
+                </div>
+                <div className="trend-chart">
+                  <Line data={trendData} options={trendOptions} />
+                </div>
+                <div className="panel-footnote">
+                  Hired counts are grouped by application date in this view, not actual hire date.
+                </div>
+              </article>
+
+              <article className="panel pipeline-panel">
+                <div className="panel-header compact">
+                  <div>
+                    <span className="panel-overline">WORKFLOW</span>
+                    <h2>Recruitment pipeline</h2>
+                    <p>See how applications are distributed across stages.</p>
+                  </div>
+                </div>
+                <div className="pipeline-list">
+                  {pipeline.map((stage) => (
+                    <div className="pipeline-row" key={stage.label}>
+                      <div className="pipeline-label">{stage.label}</div>
+                      <div className="pipeline-track">
+                        <div
+                          className="pipeline-fill"
+                          style={{ width: `${stage.width}%`, backgroundColor: stage.color }}
+                        />
+                      </div>
+                      <strong>{stage.count}</strong>
+                    </div>
+                  ))}
+                </div>
+              </article>
+
+              <article className="panel recent-panel">
+                <div className="panel-header compact">
+                  <div>
+                    <span className="panel-overline">LATEST UPDATES</span>
+                    <h2>Recent applications</h2>
+                    <p>The latest applications received by your office.</p>
+                  </div>
+                  <button 
+  className="quiet-link" 
+  type="button" 
+  onClick={() => navigate("/hr/applications")}
+  style={{
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '6px 14px',
+    background: '#eef2ff',
+    color: '#4F46E5',
+    border: '1px solid #c7d2fe',
+    borderRadius: '999px',
+    fontSize: '10px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+    fontFamily: 'inherit'
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.background = '#4F46E5';
+    e.currentTarget.style.color = 'white';
+    e.currentTarget.style.borderColor = '#4F46E5';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.background = '#eef2ff';
+    e.currentTarget.style.color = '#4F46E5';
+    e.currentTarget.style.borderColor = '#c7d2fe';
+  }}
+>
+  View all
+</button>
+                </div>
+
+                {latestApplications.length === 0 ? (
+                  <div className="empty-state">
+                    <span className="empty-state-icon">↗</span>
+                    <strong>No applications yet</strong>
+                    <p>New submissions will appear here.</p>
+                  </div>
+                ) : (
+                  <div className="application-table-wrap">
+                    <table className="application-table">
+                      <thead>
+                        <tr>
+                          <th>Applicant</th>
+                          <th>Position</th>
+                          <th>Status</th>
+                          <th>Applied</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {latestApplications.map((application) => {
+                          const applicantName =
+                            application.applicant_name ||
+                            application.full_name ||
+                            application.name ||
+                            "Applicant";
+                          const status = STATUS_META[application.status] || {
+                            label: application.status || "Unspecified",
+                            tone: "neutral",
+                          };
+
+                          return (
+                            <tr
+                              key={application.id}
+                              onClick={() => navigate(`/hr/jobs/${application.job_id}/candidates`)}
+                              tabIndex={0}
+                              onKeyDown={(event) => {
+                                if (event.key === "Enter") {
+                                  navigate(`/hr/jobs/${application.job_id}/candidates`);
+                                }
+                              }}
+                            >
+                              <td>
+                                <div className="applicant-cell">
+                                  <span className="applicant-avatar">{getInitials(applicantName)}</span>
+                                  <span>{applicantName}</span>
+                                </div>
+                              </td>
+                              <td className="position-cell">{application.job_postings?.position_title || "—"}</td>
+                              <td><span className={`status-pill ${status.tone}`}>{status.label}</span></td>
+                              <td className="date-cell">{formatRelativeDate(application.applied_date)}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </article>
+            </div>
+
+            <aside className="dashboard-side-column">
+              <article className="panel attention-panel">
+                <div className="panel-header compact">
+                  <div>
+                    <span className="panel-overline">PRIORITIES</span>
+                    <h2>Needs attention</h2>
+                    <p>Items that may need an HR follow-up.</p>
+                  </div>
+                </div>
+                <div className="attention-list">
+                  <button type="button" className="attention-item" onClick={() => navigate("/hr/candidates?status=PENDING")}>
+                    <span className="attention-icon amber">!</span>
+                    <span className="attention-copy"><strong>Pending applications</strong><small>Awaiting initial review</small></span>
+                    <b>{metrics.pending}</b>
+                    <span className="attention-chevron">›</span>
+                  </button>
+                  <button type="button" className="attention-item" onClick={() => navigate("/hr/candidates?status=REVIEWING")}>
+                    <span className="attention-icon blue">◷</span>
+                    <span className="attention-copy"><strong>Under review</strong><small>Currently being assessed</small></span>
+                    <b>{metrics.reviewing}</b>
+                    <span className="attention-chevron">›</span>
+                  </button>
+                  {metrics.closingSoon > 0 && (
+  <button 
+    type="button"
+    className="attention-item" 
+    onClick={() => navigate("/hr/jobs?closing=soon")}
+  >
+    <span className="attention-icon rose"><BasiconsBriefcaseIcon size={14} color="currentColor" /></span>
+    <span className="attention-copy">
+      <strong>Jobs closing soon</strong>
+      <small>Closing within 14 days</small>  {/* ← update */}
+    </span>
+    <b>{metrics.closingSoon}</b>
+    <span className="attention-chevron">›</span>
+  </button>
 )}
                 </div>
-                <span className="stat-value">{card.value}</span>
-                <span className="stat-title">{card.title}</span>
-                <span className={`stat-change ${card.change.startsWith('+') ? 'positive' : 'negative'}`}>
-                  {card.change} vs last month
-                </span>
-              </div>
-            );
-          })}
-        </div>
+              </article>
 
-        {/* Main Grid: Charts */}
-        <div className="dashboard-grid">
-          {/* Hiring Trends */}
-          <div className="dashboard-card">
-            <div className="card-header">
-              <h3 style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-  <GraphChartIcon size={24} />
-  Hiring Trends
-</h3>
-            </div>
-            <div className="card-body">
-              <div className="chart-container">
-                <Line data={trendsData} options={trendsOptions} />
-              </div>
-            </div>
-          </div>
-
-          {/* Application Status Breakdown */}
-          <div className="dashboard-card">
-            <div className="card-header">
-            <h3 style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-    <img 
-    src={documentplumpLogo} 
-    alt="Applications" 
-    style={{ width: 22, height: 22, 
-      filter: 'brightness(0) saturate(100%) invert(13%) sepia(97%) saturate(1600%) hue-rotate(190deg) brightness(92%) contrast(98%)'
-     }} 
-  />
-  Application Status
-</h3>
-            </div>
-            <div className="card-body">
-              <div className="status-list">
-                {Object.entries(applicantsByStatus).map(([label, count]) => {
-                  const percent = totalApplicants > 0 ? Math.round((count / totalApplicants) * 100) : 0;
-                  const colors = statusColors[label] || { color: '#6c757d', barColor: '#adb5bd' };
-                  
-                  return (
-                    <div key={label} className="status-item">
-                      <div className="status-item-header">
-                        <span className="status-item-label">
-                          <span className="dot" style={{ background: colors.barColor }}></span>
-                          {label}
-                        </span>
-                        <span className="status-item-value">{count}</span>
-                      </div>
-                      <div className="status-progress-bar">
-                        <div 
-                          className="status-progress-fill" 
-                          style={{ 
-                            width: `${percent}%`, 
-                            background: colors.barColor 
-                          }}
-                        ></div>
-                      </div>
-                      <div className="status-item-percent">{percent}%</div>
-                    </div>
-                  );
-                })}
-                <div className="status-total">from {totalApplicants} applicants</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Grid: Recent Activity + Calendar */}
-        <div className="dashboard-grid">
-          {/* Recent Activity */}
-          <div className="dashboard-card">
-            <div className="card-header">
-             <h3 style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-  <ClockIcon size={22} />
-  Recent Activity
-</h3>
-             
-            </div>
-            <div className="card-body">
-              <div className="activity-list">
-                {recentActivity.length === 0 ? (
-                  <div className="activity-empty">No recent activity</div>
+              <article className="panel positions-panel">
+                <div className="panel-header compact">
+                  <div>
+                    <span className="panel-overline">JOB POSTINGS</span>
+                    <h2>Most applied positions</h2>
+                    <p>Positions receiving the most applications.</p>
+                  </div>
+                </div>
+                {positionBreakdown.length === 0 ? (
+                  <div className="mini-empty">No application data to show yet.</div>
                 ) : (
-                  recentActivity.slice(0, 6).map((item) => (
-                    <div 
-                      key={item.id} 
-                      className="activity-item"
-                      onClick={() => navigate(item.link)}
-                    >
-                      <div className="activity-message">{item.message}</div>
-                      <div className="activity-time">{formatDate(item.time)}</div>
-                    </div>
-                  ))
+                  <div className="position-list">
+                    {positionBreakdown.map((position, index) => {
+                      const maxCount = Math.max(positionBreakdown[0]?.count || 1, 1);
+                      return (
+                        <div className="position-item" key={position.jobId}>
+                          <div className="position-topline">
+                            <span className="position-rank">{String(index + 1).padStart(2, "0")}</span>
+                            <span className="position-name">{position.title}</span>
+                            <strong>{position.count}</strong>
+                          </div>
+                          <div className="position-track">
+                            <span style={{ width: `${(position.count / maxCount) * 100}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
-              </div>
-            </div>
-          </div>
+              </article>
 
-          {/* Calendar */}
-          <div className="dashboard-card">
-            <div className="card-header">
-             <h3 className="icon-title">
-  <img src={calendarminimalLogo} alt="calendar" className="calendar-icon" />
-  {monthNames[currentMonth.getMonth()]}, {currentMonth.getFullYear()}
-</h3>
-            </div>
-            <div className="card-body">
-              <div className="calendar-header">
-                <button className="calendar-nav-btn" onClick={() => changeMonth(-1)}>‹</button>
-                <span className="month-label">{monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}</span>
-                <button className="calendar-nav-btn" onClick={() => changeMonth(1)}>›</button>
-              </div>
-              <div className="calendar-grid">
-                {dayNames.map((day, i) => (
-                  <div key={i} className="calendar-day-header">{day}</div>
-                ))}
-                {calendarDays.map((day, i) => {
-                  const isToday = day.isCurrentMonth && 
-                    day.day === new Date().getDate() && 
-                    currentMonth.getMonth() === new Date().getMonth() && 
-                    currentMonth.getFullYear() === new Date().getFullYear();
-                  return (
-                    <div 
-                      key={i} 
-                      className={`calendar-day ${day.isCurrentMonth ? 'current-month' : 'other-month'} ${isToday ? 'today' : ''}`}
-                    >
-                      {day.day}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
+              <article className="panel quick-actions-panel">
+                <div className="panel-header compact">
+                  <div>
+                    <span className="panel-overline">SHORTCUTS</span>
+                    <h2>Quick actions</h2>
+                    <p>Common recruitment tasks.</p>
+                  </div>
+                </div>
+                <div className="quick-action-list">
+                  <button type="button" onClick={() => navigate("/hr/jobs")}>
+                    <span className="quick-action-icon">＋</span>
+                    <span><strong>Manage job postings</strong><small>Create or update vacancies</small></span>
+                    <span className="quick-action-arrow">→</span>
+                  </button>
+                  <button type="button" onClick={() => navigate("/hr/candidates")}>
+                    <span className="quick-action-icon">▤</span>
+                    <span><strong>Review applications</strong><small>Open applicant records</small></span>
+                    <span className="quick-action-arrow">→</span>
+                  </button>
+                </div>
+              </article>
+
+              <article className="minimal-note">
+                <span className="minimal-note-mark">i</span>
+                <p><strong>HR review remains essential.</strong> Dashboard counts summarize application records and do not make hiring decisions.</p>
+              </article>
+            </aside>
+          </section>
+
+          <footer className="dashboard-footer">
+            <span>HR Recruitment &amp; Screening Portal</span>
+            <span>Dashboard · {today.getFullYear()}</span>
+          </footer>
         </div>
-      </div>
+      </main>
     </>
   );
 }

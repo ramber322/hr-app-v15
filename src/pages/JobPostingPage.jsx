@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { createJobPosting, getJobPostings, updateJobStatuses } from "../services/jobService";
 import '/src/styles/JobPostingPage.css';
-import { EditJobIcon, TrashCircleIcon, MapNavigationIcon, CircularCheckSuccessIcon, CheckMarkSquareInterviewIcon, DocumentMonoIcon } from "../components/icons/CustomIcons";
+import { EditJobIcon, TrashCircleIcon, MapNavigationIcon, BasiconsBriefcaseIcon, BasiconsInstructionsIcon, CircularCheckSuccessIcon, CheckMarkSquareInterviewIcon, DocumentMonoIcon } from "../components/icons/CustomIcons";
 import Loader from '../components/Loader';
 import communityLogo from '../assets/community-icon.png';
 import calendarclockLogo from '../assets/calendar-clock-icon.png';
@@ -1016,63 +1016,123 @@ const handleDeleteJob = async () => {
 
 
 
-   {/* View Job Details Modal */}
+  {/* View Job Details Modal */}
 {showDetails && (
   <div className="modal-overlay" onClick={() => {
     if (!isEditing) setShowDetails(null);
   }}>
-    <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '700px' }}>
-      <div className="modal-header">
+    <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '720px' }}>
+
+      {/* ── HEADER ── */}
+      <div className="modal-header" style={{
+        background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+        borderBottom: '1px solid #bfdbfe',
+        borderRadius: '16px 16px 0 0',
+        padding: '20px 24px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '12px'
+      }}>
         {isEditing ? (
-         <select 
-  value={editFormData?.position_title || ''}
-  onChange={(e) => {
-    const title = e.target.value;
-    // Get the Salary Grade and Monthly Salary based on the selected title
-    const sg = POSITION_SG_MAPPING[title] || "";
-    const salary = sg ? DBM_SALARY_TABLE[sg] || 0 : 0;
-    
-    setEditFormData({
-      ...editFormData, 
-      position_title: title,
-      salary_grade: sg,
-      monthly_salary: salary
-    });
-  }}
-  style={{ 
-    width: '100%', 
-    padding: '6px 10px', 
-    border: '1px solid #ddd', 
-    borderRadius: '4px',
-    fontSize: '14px',  // ← Reduced from 20px
-    fontWeight: '500', // ← Reduced from bold
-    height: '38px'     // ← Fixed height
-  }}>
-  <option value="">Select Position...</option>
-  {POSITION_TITLES.map(title => (
-    <option key={title} value={title}>{title}</option>
-  ))}
-</select>
+          <select
+            value={editFormData?.position_title || ''}
+            onChange={(e) => {
+              const title = e.target.value;
+              const sg = POSITION_SG_MAPPING[title] || "";
+              const salary = sg ? DBM_SALARY_TABLE[sg] || 0 : 0;
+
+              setEditFormData({
+                ...editFormData,
+                position_title: title,
+                salary_grade: sg,
+                monthly_salary: salary
+              });
+            }}
+            style={{
+              width: '100%',
+              padding: '10px 14px',
+              border: '1px solid #bfdbfe',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: 500,
+              height: '42px',
+              background: 'white'
+            }}
+          >
+            <option value="">Select Position...</option>
+            {POSITION_TITLES.map(title => (
+              <option key={title} value={title}>{title}</option>
+            ))}
+          </select>
         ) : (
-          <h2>{showDetails.position_title}</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '10px',
+              background: 'white',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 2px 6px rgba(37,99,235,0.12)',
+              flexShrink: 0
+            }}>
+              <span style={{ fontSize: '18px' }}><BasiconsBriefcaseIcon size={20} color="#4F46E5" /></span>
+            </div>
+            <div>
+              <div style={{
+                fontSize: '11px',
+                fontWeight: 700,
+                color: '#1a3a5c',
+                letterSpacing: '1px',
+                textTransform: 'uppercase',
+                marginBottom: '2px'
+              }}>
+                Job Details
+              </div>
+              <h2 style={{ margin: 0, fontSize: '18px', color: '#1a1f36', fontWeight: 700 }}>
+                {showDetails.position_title}
+              </h2>
+            </div>
+          </div>
         )}
         <button className="close-modal" onClick={() => {
           if (!isEditing) setShowDetails(null);
         }}>×</button>
       </div>
-      
+
       <div className="modal-body">
-        {/* Job Details - Editable */}
-        <div className="detail-section">
-          <h4>Job Details</h4>
+
+        {/* ── JOB DETAILS ── */}
+        <div style={{
+          background: '#f8fafc',
+          border: '1px solid #e8ebf5',
+          borderRadius: '12px',
+          padding: '18px 20px',
+          marginBottom: '16px'
+        }}>
+          <h4 style={{
+            fontSize: '12px',
+            fontWeight: 700,
+            color: '#1a3a5c',
+            letterSpacing: '0.8px',
+            textTransform: 'uppercase',
+            margin: '0 0 14px 0',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <span style={{ color: '#4F46E5' }}>■</span> Job Details
+          </h4>
           <div className="detail-grid">
             <div>
               <span className="detail-label">Place of Assignment</span>
               {isEditing ? (
-                <select 
+                <select
                   value={editFormData?.place_of_assignment || ''}
                   onChange={(e) => setEditFormData({...editFormData, place_of_assignment: e.target.value})}
-                  style={{ width: '100%', padding: '6px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '6px' }}
                 >
                   <option value="">Select Office...</option>
                   {LGU_OFFICES.map(office => (
@@ -1086,84 +1146,131 @@ const handleDeleteJob = async () => {
             <div>
               <span className="detail-label">Item No.</span>
               {isEditing ? (
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={editFormData?.item_no || ''}
                   onChange={(e) => setEditFormData({...editFormData, item_no: e.target.value})}
-                  style={{ width: '100%', padding: '6px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '6px' }}
                 />
               ) : (
                 <span className="detail-value">{showDetails.item_no}</span>
               )}
             </div>
-           <div>
-  <span className="detail-label">Salary Grade</span>
-  <span style={{ 
-    display: 'block', 
-    padding: '6px', 
-    background: '#f3f4f6', 
-    borderRadius: '4px',
-    fontWeight: 'bold',
-    color: '#1a3a5c'
-  }}>
-    {editFormData?.salary_grade || showDetails.salary_grade} (Auto-set)
-  </span>
-</div>
-          <div>
-  <span className="detail-label">Monthly Salary</span>
-  <span style={{ 
-    display: 'block', 
-    padding: '6px', 
-    background: '#f3f4f6', 
-    borderRadius: '4px',
-    fontWeight: 'bold',
-    color: '#1a3a5c'
-  }}>
-    ₱{(editFormData?.monthly_salary || showDetails.monthly_salary)?.toLocaleString()} (Auto-set)
-  </span>
-</div>
+            <div>
+              <span className="detail-label">Salary Grade</span>
+              <span style={{
+                display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '8px 12px',
+  background: '#eef2ff',
+  borderRadius: '6px',
+  fontWeight: 700,
+  color: '#1a3a5c'
+              }}>
+                {editFormData?.salary_grade || showDetails.salary_grade} <span style={{ fontSize: '10px', fontWeight: 400, color: '#6c757d' }}>(auto-set)</span>
+              </span>
+            </div>
+            <div>
+              <span className="detail-label">Monthly Salary</span>
+              <span style={{
+               display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '8px 12px',
+  background: '#eef2ff',
+  borderRadius: '6px',
+  fontWeight: 700,
+  color: '#1a3a5c'
+              }}>
+                ₱{(editFormData?.monthly_salary || showDetails.monthly_salary)?.toLocaleString()} <span style={{ fontSize: '10px', fontWeight: 400, color: '#6c757d' }}>(auto-set)</span>
+              </span>
+            </div>
             <div>
               <span className="detail-label">Closing Date</span>
               {isEditing ? (
-                <input 
-                  type="date" 
+                <input
+                  type="date"
                   value={editFormData?.closing_date || ''}
                   onChange={(e) => setEditFormData({...editFormData, closing_date: e.target.value})}
-                  style={{ width: '100%', padding: '6px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '6px' }}
                 />
               ) : (
                 <span className="detail-value">{showDetails.closing_date}</span>
               )}
             </div>
-            <div>
-              <span className="detail-label">Status</span>
-              {isEditing ? (
-             <select 
-  value={editFormData?.status || 'OPEN'}  // ← Add fallback here too
-  onChange={(e) => setEditFormData({...editFormData, status: e.target.value})}
-  style={{ width: '100%', padding: '6px', border: '1px solid #ddd', borderRadius: '4px' }}
->
-  <option value="OPEN">OPEN</option>
-  <option value="CLOSED">CLOSED</option>
-</select>
-              ) : (
-                <span className="detail-value">{showDetails.status}</span>
-              )}
-            </div>
+           <div>
+  <span className="detail-label">Status</span>
+  {isEditing ? (
+    <select
+      value={editFormData?.status || 'OPEN'}
+      onChange={(e) => setEditFormData({...editFormData, status: e.target.value})}
+      style={{ 
+        width: '100%', 
+        padding: '8px', 
+        border: '1px solid #ddd', 
+        borderRadius: '6px' 
+      }}
+    >
+      <option value="OPEN">OPEN</option>
+      <option value="CLOSED">CLOSED</option>
+    </select>
+  ) : (
+    <span style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '6px',
+      padding: '4px 12px',
+      borderRadius: '999px',
+      fontSize: '12px',
+      fontWeight: 700,
+      letterSpacing: '0.3px',
+      background: showDetails.status === 'OPEN' ? '#dcfce7' : '#fef2f2',
+      color: showDetails.status === 'OPEN' ? '#166534' : '#dc2626',
+      border: `1px solid ${showDetails.status === 'OPEN' ? '#bbf7d0' : '#fecaca'}`
+    }}>
+      <span style={{
+        width: '6px',
+        height: '6px',
+        borderRadius: '50%',
+        background: showDetails.status === 'OPEN' ? '#16a34a' : '#dc2626'
+      }} />
+      {showDetails.status}
+    </span>
+  )}
+</div>
           </div>
         </div>
 
-        {/* Qualifications - Editable */}
-        <div className="detail-section">
-          <h4>Qualifications</h4>
+        {/* ── QUALIFICATIONS ── */}
+        <div style={{
+          background: '#f8fafc',
+          border: '1px solid #e8ebf5',
+          borderRadius: '12px',
+          padding: '18px 20px',
+          marginBottom: '16px'
+        }}>
+          <h4 style={{
+            fontSize: '12px',
+            fontWeight: 700,
+            color: '#1a3a5c',
+            letterSpacing: '0.8px',
+            textTransform: 'uppercase',
+            margin: '0 0 14px 0',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <span style={{ color: '#0d9488' }}>■</span> Qualifications
+          </h4>
           <div className="detail-grid">
             <div>
               <span className="detail-label">Education</span>
               {isEditing ? (
-                <select 
+                <select
                   value={editFormData?.required_education || ''}
                   onChange={(e) => setEditFormData({...editFormData, required_education: parseInt(e.target.value)})}
-                  style={{ width: '100%', padding: '6px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '6px' }}
                 >
                   {EDUCATION_OPTIONS.map(opt => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -1176,10 +1283,10 @@ const handleDeleteJob = async () => {
             <div>
               <span className="detail-label">Eligibility</span>
               {isEditing ? (
-                <select 
+                <select
                   value={editFormData?.required_eligibility || ''}
                   onChange={(e) => setEditFormData({...editFormData, required_eligibility: e.target.value})}
-                  style={{ width: '100%', padding: '6px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '6px' }}
                 >
                   {ELIGIBILITY_OPTIONS.map(opt => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -1192,10 +1299,10 @@ const handleDeleteJob = async () => {
             <div>
               <span className="detail-label">Training</span>
               {isEditing ? (
-                <select 
+                <select
                   value={editFormData?.required_training || ''}
                   onChange={(e) => setEditFormData({...editFormData, required_training: parseInt(e.target.value)})}
-                  style={{ width: '100%', padding: '6px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '6px' }}
                 >
                   {TRAINING_OPTIONS.map(opt => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -1208,10 +1315,10 @@ const handleDeleteJob = async () => {
             <div>
               <span className="detail-label">Work Experience</span>
               {isEditing ? (
-                <select 
+                <select
                   value={editFormData?.required_work_experience || ''}
                   onChange={(e) => setEditFormData({...editFormData, required_work_experience: parseInt(e.target.value)})}
-                  style={{ width: '100%', padding: '6px', border: '1px solid #ddd', borderRadius: '4px' }}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '6px' }}
                 >
                   {EXPERIENCE_OPTIONS.map(opt => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -1224,84 +1331,126 @@ const handleDeleteJob = async () => {
           </div>
         </div>
 
-        {/* Instructions - Editable */}
+        {/* ── INSTRUCTIONS ── */}
         {isEditing ? (
-          <div className="detail-section">
-            <h4>Instructions / Remarks</h4>
-            <textarea 
+          <div style={{
+            background: '#f8fafc',
+            border: '1px solid #e8ebf5',
+            borderRadius: '12px',
+            padding: '18px 20px',
+            marginBottom: '16px'
+          }}>
+            <h4 style={{
+              fontSize: '12px',
+              fontWeight: 700,
+              color: '#1a3a5c',
+              letterSpacing: '0.8px',
+              textTransform: 'uppercase',
+              margin: '0 0 12px 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <span style={{ color: '#f59e0b' }}>■</span> Instructions / Remarks
+            </h4>
+            <textarea
               value={editFormData?.instructions || ''}
               onChange={(e) => setEditFormData({...editFormData, instructions: e.target.value})}
               rows="3"
-              style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+              style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '8px', fontSize: '13px', fontFamily: 'inherit' }}
             />
           </div>
         ) : (
           showDetails.instructions && (
-            <div className="detail-section">
-              <h4>Instructions / Remarks</h4>
-              <p style={{ fontSize: 14, lineHeight: 1.5, margin: 0 }}>{showDetails.instructions}</p>
+            <div style={{
+              background: '#fffbeb',
+              border: '1px solid #fde68a',
+              borderRadius: '12px',
+              padding: '16px 20px',
+              marginBottom: '16px'
+            }}>
+              <h4 style={{
+                fontSize: '12px',
+                fontWeight: 700,
+                color: '#92400e',
+                letterSpacing: '0.8px',
+                textTransform: 'uppercase',
+                margin: '0 0 8px 0',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <BasiconsInstructionsIcon size={16} color="#92400e" /> Instructions / Remarks
+              </h4>
+              <p style={{ fontSize: '13px', lineHeight: 1.6, margin: 0, color: '#78350f' }}>{showDetails.instructions}</p>
             </div>
           )
         )}
 
-        {/* Modal Actions */}
-        <div className="modal-actions" style={{ marginTop: 24, display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+        {/* ── ACTIONS ── */}
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '20px' }}>
           {isEditing ? (
             <>
-              <button 
-                className="cancel-btn" 
+              <button
+                className="cancel-btn"
                 onClick={() => {
                   setIsEditing(false);
                   setEditFormData(null);
                 }}
-                style={{ flex: 1, backgroundColor: '#f3f4f6', color: '#4a5568', border: 'none', padding: '10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '500', minWidth: '100px' }}
+                style={{ flex: 1, backgroundColor: '#f3f4f6', color: '#4a5568', border: 'none', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, minWidth: '120px', transition: 'background 0.2s ease' }}
+                onMouseEnter={(e) => e.currentTarget.style.background = '#e5e7eb'}
+                onMouseLeave={(e) => e.currentTarget.style.background = '#f3f4f6'}
               >
                 Cancel Edit
               </button>
-           <button 
-  className="save-btn" 
-  onClick={() => setShowEditConfirm(true)}  // Show confirmation first
-  style={{ flex: 1, backgroundColor: '#0d9488', color: 'white', border: 'none', padding: '10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '500', minWidth: '100px' }}
->
-  Save Changes
-</button>
+              <button
+                className="save-btn"
+                onClick={() => setShowEditConfirm(true)}
+                style={{ flex: 1, backgroundColor: '#0d9488', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, minWidth: '120px', transition: 'background 0.2s ease' }}
+                onMouseEnter={(e) => e.currentTarget.style.background = '#0f766e'}
+                onMouseLeave={(e) => e.currentTarget.style.background = '#0d9488'}
+              >
+                Save Changes
+              </button>
             </>
           ) : (
             <>
-              <button 
-                className="cancel-btn" 
-                onClick={() => setShowDetails(null)}
-                style={{ flex: 1, backgroundColor: '#D3F0F9', color: '#1A3A5C', border: 'none', padding: '10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '500' }}
-              >
-                Close
-              </button>
-
-   <button 
-                className="delete-btn" 
+              
+              <button
+                className="delete-btn"
                 onClick={() => setShowDeleteConfirm(true)}
-                style={{ 
-                  backgroundColor: '#dc2626', 
-                  color: 'white', 
-                  border: 'none', 
-                  padding: '10px 20px', 
-                  borderRadius: '6px', 
+                style={{
+                  flex: 1,
+                  backgroundColor: '#dc2626',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 20px',
+                  borderRadius: '8px',
                   display: 'flex',
-    alignItems: 'center',
-    marginTop: '2px',
-    gap: '6px',
-                  cursor: 'pointer', 
-                  fontWeight: '500',
+                  alignItems: 'center',
+                  justifyContent: 'center',  // ← add for centering
+                  gap: '8px',
+                  cursor: 'pointer',
+                  
+                  fontWeight: 600,
                   transition: 'background 0.2s ease'
                 }}
                 onMouseEnter={(e) => e.currentTarget.style.background = '#b91c1c'}
                 onMouseLeave={(e) => e.currentTarget.style.background = '#dc2626'}
               >
-                 <TrashCircleIcon size={24} color="white" style = {{marginLeft: '43px' }}/> Delete
+                 <span style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    transform: 'translateX(-16px)'   // ← shifts ONLY the content
+  }}>
+                <TrashCircleIcon size={26} color="white" />
+                Delete
+                </span>
               </button>
 
-
-              <button 
-                className="edit-btn" 
+              <button
+                className="edit-btn"
                 onClick={() => {
                   setEditFormData({
                     position_title: showDetails.position_title,
@@ -1318,29 +1467,34 @@ const handleDeleteJob = async () => {
                   });
                   setIsEditing(true);
                 }}
-                  style={{ 
-    flex: 1, 
-    backgroundColor: '#4f46e5', 
-    color: 'white', 
-    border: 'none', 
-    padding: '10px', 
-    borderRadius: '6px', 
-    cursor: 'pointer', 
-    fontWeight: '500',
+                style={{
+                  flex: 1,
+                  backgroundColor: '#4f46e5',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 20px',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  transition: 'background 0.2s ease'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = '#4338ca'}
+                onMouseLeave={(e) => e.currentTarget.style.background = '#4f46e5'}
+              >
+                 <span style={{
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: '6px',
-    transition: 'background 0.2s ease'
-  }}
-  onMouseEnter={(e) => e.currentTarget.style.background = '#4338ca'}
-  onMouseLeave={(e) => e.currentTarget.style.background = '#4f46e5'}
->
-  <EditJobIcon size={24} color="white" style = {{marginLeft: '-8px'}} />
-  Edit Job
-</button>
-             
-             
+    gap: '8px',
+    transform: 'translateX(-10px)'   // ← shifts ONLY the content
+  }}>
+                <EditJobIcon size={26} color="white" />
+                Edit Job
+                </span>
+              </button>
             </>
           )}
         </div>
