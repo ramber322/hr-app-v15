@@ -35,7 +35,10 @@ function ProtectedRoute({ children, allowedRoles }) {
 
   // WRONG ROLE
   if (!allowedRoles.includes(userRole)) {
-    if (userRole === "hr") {
+    // 🆕 Route to correct dashboard based on role
+    if (userRole === "superadmin") {
+      return <Navigate to="/admin/dashboard" replace />;
+    } else if (userRole === "hr") {
       return <Navigate to="/hr/dashboard" replace />;
     } else {
       return <Navigate to="/applicant/dashboard" replace />;

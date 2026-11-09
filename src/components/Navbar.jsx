@@ -2,18 +2,22 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import NotificationBell from './NotificationBell';
+import { logActivity } from "../lib/logActivity";
+
 import { 
   DashboardIcon, 
   BrowseJobsIcon, 
   MyApplicationsIcon,
+  BasiconsArchiveDrawerFillIcon,
+  BasiconsArchiveDrawerLineIcon,
   JobsIcon,
   ReportsIcon,
   ProfileIcon,
   LogoutIcon,
   NewspaperIcon,
   BulletedListIcon,
-  ApplicationsIcon
-  
+  ApplicationsIcon,
+  AccountUserRoundIcon
 } from './icons/CustomIcons';
 import "../styles/Navbar.css";
 import chrmoLogo from '../assets/chrmo-official-seal.png';
@@ -85,6 +89,11 @@ function Navbar({ userRole = 'applicant' }) {
   }, []);
 
   const menuItems = {
+    superadmin: [
+      { name: 'Dashboard', path: '/admin/dashboard', icon: <DashboardIcon size={18} /> },
+      { name: 'Manage Users', path: '/admin/users', icon: <AccountUserRoundIcon size={18} strokeWidth={2} /> },
+      { name: 'System Log', path: '/admin/activity', icon: <BasiconsArchiveDrawerLineIcon size={18} /> }
+    ],
     hr: [
       { name: 'Dashboard', path: '/hr/dashboard', icon: <DashboardIcon size={18} /> },
       { name: 'Job Postings', path: '/hr/jobs', icon: <JobsIcon size={18} /> },
@@ -100,6 +109,22 @@ function Navbar({ userRole = 'applicant' }) {
 
   const currentMenu = menuItems[currentUserRole] || menuItems.applicant;
 
+  const getRoleLabel = () => {
+    switch (currentUserRole) {
+      case 'superadmin': return 'Super Admin';
+      case 'hr': return 'HR Personnel';
+      default: return 'Job Applicant';
+    }
+  };
+
+  const getDashboardPath = () => {
+    switch (currentUserRole) {
+      case 'superadmin': return '/admin/dashboard';
+      case 'hr': return '/hr/dashboard';
+      default: return '/applicant/dashboard';
+    }
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -110,18 +135,23 @@ function Navbar({ userRole = 'applicant' }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleLogout = async () => {
+   const handleLogout = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await logActivity('logout', `${user.email} logged out`, { user });
+      }
       await supabase.auth.signOut();
     } catch (error) {
       console.warn('Logout API failed:', error);
     }
-    
-    localStorage.clear(); 
+
+    localStorage.clear();
     sessionStorage.clear();
     window.location.replace('/login');
   };
 
+  // ✅ ADD THIS — it's used by nav items
   const isActive = (path) => {
     return location.pathname === path;
   };
@@ -129,7 +159,7 @@ function Navbar({ userRole = 'applicant' }) {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <div className="logo" onClick={() => navigate(currentUserRole === 'hr' ? '/hr/dashboard' : '/applicant/dashboard')}>
+        <div className="logo" onClick={() => navigate(getDashboardPath())}>
          <img src={chrmoLogo} alt="CHRMO" className="navbar-logo-image" />
           <span className="logo-text">CHRMO Portal</span>
         </div>
@@ -140,7 +170,7 @@ function Navbar({ userRole = 'applicant' }) {
 
         <div className={`nav-right ${mobileMenuOpen ? 'mobile-open' : ''}`}>
           <span className="role-badge">
-            {currentUserRole === 'hr' ? 'HR Personnel' : 'Job Applicant'}
+            {getRoleLabel()}
           </span>
 
           <ul className="nav-menu">
@@ -159,7 +189,6 @@ function Navbar({ userRole = 'applicant' }) {
             ))}
           </ul>
 
-          {/* Notification Bell - Only for Applicants */}
           {currentUserRole === 'applicant' && (
             <div className="bell-wrapper">
               <NotificationBell />
@@ -183,24 +212,23 @@ function Navbar({ userRole = 'applicant' }) {
               <div className="dropdown-menu">
                 <div className="dropdown-header">
                   <div className="dropdown-name">{userName || 'User'}</div>
-                <div 
-  className="dropdown-email"
-  style={{
-    width: '150px',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-    }}
-  title={userEmail || 'user@email.com'}
->
-  {userEmail || 'user@email.com'}
-</div>
+                  <div 
+                    className="dropdown-email"
+                    style={{
+                      width: '150px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                    title={userEmail || 'user@email.com'}
+                  >
+                    {userEmail || 'user@email.com'}
+                  </div>
                   <div className="dropdown-role">
-                    {currentUserRole === 'hr' ? 'HR Personnel' : 'Job Applicant'}
+                    {getRoleLabel()}
                   </div>
                 </div>
                 
-                {/* My Profile - Applicant Only */}
                 {currentUserRole === 'applicant' && (
                   <div className="dropdown-item" onClick={() => {
                     navigate('/applicant/profile');
@@ -211,25 +239,26 @@ function Navbar({ userRole = 'applicant' }) {
                   </div>
                 )}
                 
-                {/* Activity Log - HR Only */}
                 {currentUserRole === 'hr' && (
                   <div className="dropdown-item" onClick={() => {
                     navigate('/hr/activitylog');
                     setDropdownOpen(false);
                     setMobileMenuOpen(false);
                   }}>
-                  <span> <BulletedListIcon size={20} color="#1e293b" /></span> Activity Log
+                    <span> <BasiconsArchiveDrawerLineIcon size={20} color="#1e293b" /></span> Activity Log
                   </div>
                 )}
+
+                
                 
                 <div className="dropdown-divider"></div>
                 
-               <div className="dropdown-item" onClick={() => {
-  handleLogout();
-  setDropdownOpen(false);
-}} style={{ color: 'grey' }}>
-  <span><LogoutIcon color="black" /></span> Logout
-</div>
+                <div className="dropdown-item" onClick={() => {
+                  handleLogout();
+                  setDropdownOpen(false);
+                }} style={{ color: 'grey' }}>
+                  <span><LogoutIcon color="black" /></span> Logout
+                </div>
               </div>
             )}
           </div>

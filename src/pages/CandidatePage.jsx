@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { supabase } from "../lib/supabase";
-import { DocumentListIcon, NewspaperIcon } from "../components/icons/CustomIcons";
+import { BasiconsArchiveDrawerLineIcon, BasiconsProfileLineIcon } from "../components/icons/CustomIcons";
 import Loader from '../components/Loader';
+import "../styles/AdminDashboardPage.css";
 
 export default function CandidatesPage() {
   
@@ -172,6 +173,7 @@ export default function CandidatesPage() {
   };
 
   const styles = `
+  
     .candidates-container {
       padding-top: 80px;
       padding-left: 24px;
@@ -180,6 +182,7 @@ export default function CandidatesPage() {
       min-height: 100vh;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
+      
 
     .page-header {
       margin-bottom: 24px;
@@ -441,7 +444,7 @@ export default function CandidatesPage() {
   marginLeft: '-20px'
 }}>
   
-  <NewspaperIcon size={33} color="#1a3a5c" /> 
+  <BasiconsProfileLineIcon size={33} color="#1a3a5c" /> 
   Applications
 </h1>
           <p>View and manage all job applications across all postings</p>

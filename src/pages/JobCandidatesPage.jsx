@@ -12,7 +12,7 @@ import communityLogo from '../assets/community3-icon.png';
 import calendarminimalLogo from '../assets/calendar-minimal-icon.png';
 import compareplumpLogo from '../assets/compare-plump-icon.png';
 import Loader from '../components/Loader';
-
+import { logActivity } from "../lib/logActivity";
 
 export default function JobCandidatesPage() {
 // ─── Helper: extract a short label from a factor string ──
@@ -482,19 +482,20 @@ const [bulkUpdateSuccessMessage, setBulkUpdateSuccessMessage] = useState(null);
   };
 
   const getStatusColor = (status) => {
-    const colors = {
-      PENDING: { bg: "#FFF3E0", color: "#E65100", label: "Pending" },
-      REVIEWING: { bg: "#E3F2FD", color: "#1565C0", label: "Under Review" },
-      QUALIFIED: { bg: "#E8F5E9", color: "#2E7D32", label: "Qualified" },
-      SHORTLISTED: { bg: "#E8F5E9", color: "#2E7D32", label: "Shortlisted" },
-      INTERVIEW_SCHEDULED: { bg: "#F3E5F5", color: "#7B1FA2", label: "Interview Scheduled" },
-      HIRED: { bg: "#E8F5E9", color: "#1B5E20", label: "Hired" },
-      NOT_SELECTED: { bg: "#FFEBEE", color: "#C62828", label: "Not Selected" },
-      REJECTED: { bg: "#FFEBEE", color: "#C62828", label: "Rejected" },
-      WITHDRAWN: { bg: "#F3E5F5", color: "#6A1B9A", label: "Withdrawn" }
-    };
-    return colors[status] || colors["PENDING"];
+  const colors = {
+    PENDING:             { bg: "#FFF3E0", color: "#E65100", label: "Pending" },
+    REVIEWING:           { bg: "#E3F2FD", color: "#1565C0", label: "Under Review" },
+    QUALIFIED:           { bg: "#F3E5F5", color: "#7B1FA2", label: "Qualified" },
+    SHORTLISTED:         { bg: "#F3E5F5", color: "#7B1FA2", label: "Shortlisted" },
+    FOR_INTERVIEW:       { bg: "#E8F5E9", color: "#2E7D32", label: "For Interview" },
+    INTERVIEW_SCHEDULED: { bg: "#E8F5E9", color: "#2E7D32", label: "Interview Scheduled" },
+    HIRED:               { bg: "#E8F5E9", color: "#1B5E20", label: "Hired" },
+    NOT_SELECTED:        { bg: "#FFEBEE", color: "#C62828", label: "Not Selected" },
+    REJECTED:            { bg: "#FFEBEE", color: "#C62828", label: "Rejected" },
+    WITHDRAWN:           { bg: "#F3E5F5", color: "#6A1B9A", label: "Withdrawn" },
   };
+  return colors[status] || colors["PENDING"];
+};
 
   const getScoreColor = (score) => {
     if (!score) return "#6c757d";
@@ -577,11 +578,15 @@ const [bulkUpdateSuccessMessage, setBulkUpdateSuccessMessage] = useState(null);
     // Get job details for notifications
     const { data: jobData, error: jobError } = await supabase
       .from('job_postings')
-      .select('position_title')
+      .select('position_title, item_no')
       .eq('id', appsData[0]?.job_id)
       .single();
 
     if (jobError) throw jobError;
+
+    const bulkJobLabel = jobData.item_no
+  ? `(Item No. ${jobData.item_no})`
+  : `"${jobData.position_title}"`;
 
     const updatePromises = appsData.map(async (app) => {
       const oldStatus = app.status || 'PENDING';
@@ -686,6 +691,12 @@ const [bulkUpdateSuccessMessage, setBulkUpdateSuccessMessage] = useState(null);
     });
 
     await Promise.all(updatePromises);
+
+     await logActivity(
+      'status_update',
+      `Bulk-updated ${appsData.length} applicant${appsData.length > 1 ? 's' : ''} ${bulkJobLabel} to ${newStatus}`,
+      { metadata: { application_ids: selectedRows, new_status: newStatus } }
+    );
 
     // Show success notification instead of alert
 setBulkUpdateSuccessMessage(` Successfully updated ${selectedRows.length} candidate(s) to ${newStatus}`);
@@ -1031,19 +1042,26 @@ setBulkUpdating(false);
   setUpdatingStatus(true);
   
   try {
-    const oldStatus = selectedApplication?.status || 'PENDING';
-    
     const { data: appData, error: appError } = await supabase
       .from('applications')
-      .select('applicant_id, job_id')
+      .select('status, applicant_id, job_id')
       .eq('id', applicationId)
       .single();
     
     if (appError) throw appError;
-    
+
+    const oldStatus = appData.status;
+
+    const { data: applicantData } = await supabase
+      .from('applicants')
+      .select('full_name')
+      .eq('id', appData.applicant_id)
+      .maybeSingle();
+    const applicantName = applicantData?.full_name || 'Applicant';
+
     const { data: jobData, error: jobError } = await supabase
       .from('job_postings')
-      .select('position_title')
+      .select('position_title, item_no')
       .eq('id', appData.job_id)
       .single();
     
@@ -1058,6 +1076,16 @@ setBulkUpdating(false);
       .eq('id', applicationId);
     
     if (error) throw error;
+
+    // log activity
+if (oldStatus !== newStatus) {
+  const itemPart = jobData.item_no ? `(Item No. ${jobData.item_no})` : `"${jobData.position_title}"`;
+  await logActivity(
+    'status_update',
+    `Changed ${applicantName} ${itemPart}: ${oldStatus} → ${newStatus}`,
+    { job_id: appData.job_id }
+  );
+}
     
     if (newStatus === 'INTERVIEW_SCHEDULED') {
       const { data: existingInterview, error: checkError } = await supabase

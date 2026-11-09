@@ -10,6 +10,7 @@ import calendarclockLogo from '../assets/calendar-clock-icon.png';
 import clipboardactivitylogLogo from '../assets/clipboard-activitylog-icon.png';
 import calendarminimalLogo from '../assets/calendar-minimal-icon.png';
 import { supabase } from "../lib/supabase";
+import { logActivity } from "../lib/logActivity";
 
 // =========================
 // POSITION TITLES (Combined with Level)
@@ -242,7 +243,18 @@ const handleEditJob = async () => {
     }
 
     console.log('✅ Updated data:', data);
-    
+
+    // saved edit info into activity_logs table
+const itemPart = editFormData.item_no
+  ? `(Item No. ${editFormData.item_no})`
+  : `"${editFormData.position_title}"`;
+
+await logActivity(
+  'job_updated',
+  `Updated job ${itemPart}`,
+  { job_id: showDetails.id }
+);
+
     // Close the confirmation modal
     setShowEditConfirm(false);
     
@@ -363,6 +375,13 @@ const handleDeleteJob = async () => {
 
     if (error) throw error;
 
+    // logged into activity logtable
+    await logActivity(
+      'job_deleted',
+      `Deleted job: "${showDetails.position_title}"`,
+      { job_id: showDetails.id }
+    );
+
     // Close the confirmation modal
     setShowDeleteConfirm(false);
     
@@ -420,7 +439,10 @@ const handleDeleteJob = async () => {
   if (result.success) {
     setJobPostSuccessMessage(` Job "${pendingJobData.positionTitle}" posted successfully!`);
     setTimeout(() => setJobPostSuccessMessage(null), 5000);
-    
+    await logActivity("job_created", `Created job: "${pendingJobData.positionTitle}"`, {
+    job_id: result.data?.id,
+  });
+
     setShowConfirmPostModal(false);
     setShowForm(false);
     loadJobPostings();

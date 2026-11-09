@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import '/src/styles/LoginPage.css';
 import { LoginBarGraphIcon, MapNavigationIcon, OpenFolderIcon, LampElectricIcon, BankBuildingIcon } from "../components/icons/CustomIcons";
+import { logActivity } from "../lib/logActivity"; 
 
 // Import images from assets folder
 import lguLogo from '../assets/lgu-official-seal.png';
@@ -15,39 +16,53 @@ function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError('');
-    
-    if (!email || !password) {
-      setError('Please fill in all fields');
+ const handleLogin = async (e) => {
+  e.preventDefault();
+  setError('');
+
+  if (!email || !password) {
+    setError('Please fill in all fields');
+    return;
+  }
+
+  setIsLoading(true);
+
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      setError(error.message);
+      setIsLoading(false);
       return;
     }
-    
-    setIsLoading(true);
-    
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
+
+    if (data.user) {
+      const userRole = data.user.user_metadata?.role || 'applicant';
+      console.log('Login successful:', data.user);
+
+      // ✅ pass the user we already have
+      await logActivity('login', `${data.user.email} logged in`, {
+        user: data.user,
       });
 
-      if (error) {
-        setError(error.message);
-        setIsLoading(false);
-        return;
+      if (userRole === 'superadmin') {
+        navigate('/admin/dashboard');
+      } else if (userRole === 'hr') {
+        navigate('/hr/dashboard');
+      } else {
+        navigate('/applicant/dashboard');
       }
-
-      if (data.user) {
-        const userRole = data.user.user_metadata?.role || 'applicant';
-        console.log('Login successful:', data.user);
-        navigate(userRole === 'hr' ? '/hr/dashboard' : '/applicant/dashboard');
-      }
-    } catch (err) {
-      setError('An unexpected error occurred');
-      setIsLoading(false);
     }
-  };
+  } catch (err) {
+    console.error(err);
+    setError('An unexpected error occurred');
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <div className="login-page-wrapper"> 

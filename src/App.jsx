@@ -24,6 +24,11 @@ import BrowseJobsPage from "./pages/BrowseJobsPage";
 import MyApplicationsPage from "./pages/MyApplicationsPage";
 import ApplicantProfilePage from "./pages/ApplicantProfilePage";
 
+// 🆕 Super Admin Pages
+import AdminDashboardPage from "./pages/AdminDashboardPage";
+import ManageUsersPage from "./pages/ManageUsersPage";
+import AdminActivityPage from "./pages/AdminActivityPage";
+
 // Create a wrapper for public routes that redirects if logged in
 function PublicRoute({ children }) {
   const [session, setSession] = useState(null);
@@ -40,7 +45,11 @@ function PublicRoute({ children }) {
 
   if (session) {
     const userRole = session.user?.user_metadata?.role;
-    if (userRole === 'hr') {
+
+    // 🆕 Route to correct dashboard by role
+    if (userRole === 'superadmin') {
+      return <Navigate to="/admin/dashboard" replace />;
+    } else if (userRole === 'hr') {
       return <Navigate to="/hr/dashboard" replace />;
     } else {
       return <Navigate to="/applicant/dashboard" replace />;
@@ -94,23 +103,24 @@ function App() {
           } 
         />
 
-{/* ==================== SMS TEST ROUTE ==================== */}
-  <Route 
-    path="/test-sms" 
-     element = { <PublicRoute>
+        <Route 
+          path="/test-sms" 
+          element={
+            <PublicRoute>
               <SendSmsTest />
-            </PublicRoute> }
-  />
+            </PublicRoute>
+          }
+        />
 
-{/* ==================== EMAIL TEST ROUTE ==================== */}
-  <Route 
-    path="/test-email" 
-     element = { <PublicRoute>
+        <Route 
+          path="/test-email" 
+          element={
+            <PublicRoute>
               <EmailTest />
-            </PublicRoute> }
-  />      
+            </PublicRoute>
+          }
+        />
 
-    
         <Route 
           path="/signup" 
           element={
@@ -125,12 +135,42 @@ function App() {
           path="/" 
           element={
             session ? (
-              session.user?.user_metadata?.role === 'hr' 
+              session.user?.user_metadata?.role === 'superadmin'
+                ? <Navigate to="/admin/dashboard" replace />
+                : session.user?.user_metadata?.role === 'hr'
                 ? <Navigate to="/hr/dashboard" replace />
                 : <Navigate to="/applicant/dashboard" replace />
             ) : (
               <Navigate to="/login" replace />
             )
+          } 
+        />
+
+        {/* ==================== SUPER ADMIN ROUTES ==================== */}
+        <Route 
+          path="/admin/dashboard" 
+          element={
+            <ProtectedRoute allowedRoles={['superadmin']}>
+              <AdminDashboardPage />
+            </ProtectedRoute>
+          } 
+        />
+
+        <Route 
+          path="/admin/users" 
+          element={
+            <ProtectedRoute allowedRoles={['superadmin']}>
+              <ManageUsersPage />
+            </ProtectedRoute>
+          } 
+        />
+
+        <Route 
+          path="/admin/activity" 
+          element={
+            <ProtectedRoute allowedRoles={['superadmin']}>
+              <AdminActivityPage />
+            </ProtectedRoute>
           } 
         />
 
@@ -171,7 +211,6 @@ function App() {
           } 
         />
 
-        {/* Recent Applications - Navbar link */}
         <Route 
           path="/hr/candidates" 
           element={
@@ -181,7 +220,6 @@ function App() {
           } 
         />
 
-        {/* Job-Specific Candidates - Drill down from jobs page */}
         <Route 
           path="/hr/jobs/:jobId/candidates" 
           element={
@@ -191,7 +229,6 @@ function App() {
           } 
         />
 
-        {/* ADD THIS: Interview Schedule Page */}
         <Route 
           path="/hr/jobs/:jobId/interviews" 
           element={

@@ -1,0 +1,162 @@
+.activity-container {
+  padding-top: 80px;
+  padding-left: 24px;
+  padding-right: 24px;
+  background: #f5f6f8;
+  min-height: 100vh;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.page-header { margin-bottom: 24px; }
+.page-header h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #1a1f36;
+  font-weight: 700;
+}
+.page-header p {
+  color: #6c757d;
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+.controls {
+  background: white;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 8px 14px;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+}
+.search-input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.filter-select {
+  padding: 8px 14px;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  background: white;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.filter-select:focus {
+  outline: none;
+  border-color: #4f46e5;
+}
+
+.activity-count {
+  font-size: 13px;
+  color: #6c757d;
+  margin-left: auto;
+}
+
+.activity-table-wrapper {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.activity-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.activity-table thead { background: #f8fafc; }
+.activity-table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #4a5568;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #e8ebf5;
+  white-space: nowrap;
+}
+.activity-table td {
+  padding: 14px 16px;
+  font-size: 14px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+  color: #1a1f36;
+}
+.activity-table tr:hover td { background: #f8f9fa; }
+.activity-table tr:last-child td { border-bottom: none; }
+
+.cell-name {
+  font-weight: 600;
+  color: #1a1f36;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cell-email { color: #6c757d; font-size: 13px; }
+.cell-description { color: #1a1f36; }
+
+/* page-scoped badges — no collision with navbar's .role-badge */
+.log-badge {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-weight: 600;
+  background: #e9ecef;
+  color: #6c757d;
+  display: inline-block;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+.log-badge.hr { background: #e3f2fd; color: #1565c0; }
+.log-badge.applicant { background: #e8f5e9; color: #2e7d32; }
+.log-badge.superadmin { background: #ede9fe; color: #6d28d9; }
+.log-badge.action {
+  background: #f1f5f9;
+  color: #334155;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 60px;
+  color: #6c757d;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+.empty-state .icon {
+  font-size: 40px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .activity-container { padding: 16px; padding-top: 80px; }
+  .controls { flex-direction: column; align-items: stretch; }
+  .search-input { width: 100%; }
+  .activity-count { text-align: right; }
+  .activity-table-wrapper { overflow-x: auto; }
+  .activity-table { min-width: 720px; }
+}

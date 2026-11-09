@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 import { supabase } from "../lib/supabase";
 import "../styles/ActivityLogPage.css";
 import activitylogLogo from '../assets/activitylog-new-icon.png';
-import { BriefcaseActivityLogIcon, SyncIcon, UpdatedPencilActivityLogIcon, MailActivityLogIcon, UserAddActivityLogIcon } from "../components/icons/CustomIcons";
+import { BriefcaseActivityLogIcon, BasiconsArchiveDrawerLineIcon, SyncIcon, UpdatedPencilActivityLogIcon, MailActivityLogIcon, UserAddActivityLogIcon } from "../components/icons/CustomIcons";
 import Loader from '../components/Loader';
 
 export default function ActivityLogPage() {
@@ -405,19 +405,9 @@ export default function ActivityLogPage() {
         <style>{styles}</style>
 
         <div className="page-header" >
-         <h1 style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-<img 
-  src={activitylogLogo} 
-  alt="log" 
-  style={{ 
-    width: 38, 
-    height: 38,
-    
-    filter: 'brightness(0) saturate(100%) invert(13%) sepia(97%) saturate(1600%) hue-rotate(190deg) brightness(92%) contrast(98%)'
-   
-  }} 
-/>
-Activity Logs
+      <h1 style={{ display: "flex", alignItems: "center", gap: "10px", margin: 0, fontSize: "28px", color: "#1a1f36" }}>
+  <BasiconsArchiveDrawerLineIcon size={32} color="#1a3a5c" />
+  Activity Logs
 </h1>
           <p>Track actions made within the system</p>
         </div>
