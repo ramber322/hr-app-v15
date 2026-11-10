@@ -6,7 +6,7 @@ import Navbar from "../components/Navbar";
 import { notifyStatusChange } from '../services/notificationService';
 import { supabase } from "../lib/supabase";
 import "../styles/JobCandidatesPage.css";
-import { DocumentCheckIcon, CircularCheckSuccessIcon, NewspaperIcon, CheckInterviewIconDashboard, CheckMarkSquareInterviewIcon,  PdfIcon, CheckboxMassIcon, ReverseTabArrowIcon, JusticePlumpIcon, CheckSquareIcon, MagnifyingGlassPlumpIcon } from "../components/icons/CustomIcons";
+import { DocumentCheckIcon, BasiconsUserBookIcon, CircularCheckSuccessIcon, NewspaperIcon, CheckInterviewIconDashboard, CheckMarkSquareInterviewIcon,  PdfIcon, CheckboxMassIcon, ReverseTabArrowIcon, JusticePlumpIcon, CheckSquareIcon, MagnifyingGlassPlumpIcon } from "../components/icons/CustomIcons";
 import JobCandidateButton from "../components/JobCandidateButton";
 import communityLogo from '../assets/community3-icon.png';
 import calendarminimalLogo from '../assets/calendar-minimal-icon.png';
@@ -1235,9 +1235,11 @@ if (oldStatus !== newStatus) {
            <ReverseTabArrowIcon/> <span> Back </span>
           </div>
           <h1 style={{ display: 'flex', alignItems: 'center', gap: '1px' }}>
-          <img src={communityLogo} alt="Community"
-           style={{ width: 28, height: 28, verticalAlign: 'middle', marginRight: '10px',
-          filter: 'brightness(0) saturate(100%) invert(15%) sepia(60%) saturate(800%) hue-rotate(180deg) brightness(95%) contrast(90%)' }} />
+          <BasiconsUserBookIcon
+  size={40}
+  color="#1a3a5c"
+  style={{ marginRight: 8 }}
+/>
           Candidates for {job?.position_title || 'Loading...'}</h1>
           <p>Showing {candidates.length} applicant(s) for this position</p>
         </div>

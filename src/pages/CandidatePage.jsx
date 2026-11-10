@@ -325,6 +325,11 @@ export default function CandidatesPage() {
   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
 }
 
+.avatar {
+  background: #4F46E5;
+  color: #e5e9f4;
+}
+
     .applicant-info {
       display: flex;
       flex-direction: column;

@@ -77,7 +77,7 @@ function getInitials(value = "") {
   return value
     .split(" ")
     .filter(Boolean)
-    .slice(0, 2)
+    .slice(0, 1)
     .map((part) => part[0].toUpperCase())
     .join("") || "A";
 }
@@ -110,21 +110,46 @@ export default function DashboardPage() {
       }
 
       const [
-        { data: jobRows, error: jobsError },
-        { data: applicationRows, error: applicationsError },
-      ] = await Promise.all([
-        supabase.from("job_postings").select("*"),
-        supabase
-          .from("applications")
-          .select("*, job_postings(position_title)")
-          .neq("status", "WITHDRAWN"),
-      ]);
+  { data: jobRows, error: jobsError },
+  { data: applicationRows, error: applicationsError },
+] = await Promise.all([
+  supabase.from("job_postings").select("*"),
+  supabase
+    .from("applications")
+    .select("*, job_postings(position_title)")
+    .neq("status", "WITHDRAWN"),
+]);
 
-      if (jobsError) throw jobsError;
-      if (applicationsError) throw applicationsError;
+if (jobsError) throw jobsError;
+if (applicationsError) throw applicationsError;
 
-      setJobs(jobRows || []);
-      setApplications(applicationRows || []);
+// ✅ fetch applicant names for all applications
+let enrichedApplications = applicationRows || [];
+if (applicationRows && applicationRows.length > 0) {
+  const applicantIds = [...new Set(applicationRows.map((a) => a.applicant_id).filter(Boolean))];
+
+  const { data: applicantRows, error: applicantError } = await supabase
+    .from("applicants")
+    .select("id, full_name")
+    .in("id", applicantIds);
+
+  if (applicantError) {
+    console.error("Error loading applicants:", applicantError);
+  } else {
+    const applicantsMap = Object.fromEntries(
+      (applicantRows ?? []).map((a) => [a.id, a])
+    );
+
+    enrichedApplications = applicationRows.map((app) => ({
+      ...app,
+      applicant_name: applicantsMap[app.applicant_id]?.full_name ?? null,
+    }));
+  }
+}
+
+setJobs(jobRows || []);
+setApplications(enrichedApplications);
+
     } catch (error) {
       console.error("Error loading dashboard:", error);
       setLoadError("We couldn't load the dashboard data. Please try refreshing.");
@@ -532,7 +557,8 @@ export default function DashboardPage() {
                               </td>
                               <td className="position-cell">{application.job_postings?.position_title || "—"}</td>
                               <td><span className={`status-pill ${status.tone}`}>{status.label}</span></td>
-                              <td className="date-cell">{formatRelativeDate(application.applied_date)}</td>
+                              <td className="date-cell">{formatRelativeDate(application.applied_date)} </td>
+                              
                             </tr>
                           );
                         })}
