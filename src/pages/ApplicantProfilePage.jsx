@@ -804,7 +804,7 @@ if (!allowedTypes.includes(file.type)) {
                       <div className="doc-name">
                         {doc.type === 'pds' && ''}
                         {doc.type === 'transcript' && ''}
-                        {doc.type === 'performanceRating' && '⭐'}
+                        {doc.type === 'performanceRating' && ''}
                         {doc.type === 'eligibility' && '🏅'}
                         {doc.type === 'trainingCert' && '📜'}
                         {doc.label}
