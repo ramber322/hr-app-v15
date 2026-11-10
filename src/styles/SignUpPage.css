@@ -1,858 +1,399 @@
+/* =========================================
+   CHRMO ILIGAN - SIGNUP PAGE
+   Fits in viewport, centered, scrolls on small screens
+========================================= */
 
-/* src/styles/SignUpPage.css */
+:root {
+   --auth-primary: #4F46E5;
+  --auth-primary-hover: #4338CA;   /* one shade darker for hover */
+  --auth-primary-light: #EEF2FF;   /* light indigo tint — used on logo bg */
+  --auth-bg: #EEF2F7;
+  --auth-heading: #1E293B;
+  --auth-text: #64748B;
+  --auth-muted: #94A3B8;
+  --auth-border: #E2E8F0;
+  --auth-input-bg: #F8FAFC;
+}
 
-/* =========================================================
-   RESET
-   ========================================================= */
+/* ---------- PAGE ---------- */
 
-* {
+html, body {
   margin: 0;
   padding: 0;
+}
+
+body {
+  overflow-y: auto;   /* ensure scrolling allowed globally */
+}
+
+.auth-page {
+  min-height: 100vh;
+  min-height: 100dvh;   /* better on mobile — accounts for browser UI */
+  width: 100%;
+  background: var(--auth-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 20px;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
   box-sizing: border-box;
 }
 
-html,
-body {
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
+/* ---------- CARD ---------- */
 
-.signup-page {
-  background: #0396ff;
-  min-height: 100vh;
-}
-
-/* =========================================================
-   MAIN WRAPPER
-   ========================================================= */
-
-.signup-wrapper {
-  min-height: 100vh;
+.auth-card {
   width: 100%;
+  max-width: 640px;
+  background: #FFFFFF;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 16px;
+  padding: 36px 40px 32px;
+  box-shadow:
+    0 12px 40px rgba(30, 64, 110, 0.06),
+    0 2px 6px rgba(30, 64, 110, 0.03);
+  box-sizing: border-box;
+}
+
+/* ---------- BRAND ---------- */
+
+.auth-brand {
   display: flex;
   align-items: center;
-  justify-content: center;
-
-  background-image: linear-gradient(
-    135deg,
-    #abdcff 10%,
-    #0396ff 100%
-  );
-
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-
-  padding: 30px 16px;
-  position: relative;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
-/* =========================================================
-   BACKGROUND SHAPES
-   ========================================================= */
-
-.shapes {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 0;
+.auth-logos {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
-.shape {
-  position: absolute;
+.auth-logos img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
   border-radius: 50%;
+  background: #F8FAFC;
+  padding: 4px;
+  border: 1px solid #E2E8F0;
 }
 
-/* Large top-right shape */
-.shape-1 {
-  width: 500px;
-  height: 500px;
-  top: -200px;
-  right: -150px;
-
-  background: radial-gradient(
-    circle,
-    #4f46e5,
-    transparent 70%
-  );
-
-  opacity: 0.07;
-
-  animation: floatShape 25s ease-in-out infinite;
-}
-
-/* Large bottom-left shape */
-.shape-2 {
-  width: 350px;
-  height: 350px;
-  bottom: -100px;
-  left: -100px;
-
-  background: radial-gradient(
-    circle,
-    #3b82f6,
-    transparent 70%
-  );
-
-  opacity: 0.07;
-
-  animation: floatShape 20s ease-in-out infinite reverse;
-}
-
-/* Middle shape */
-.shape-3 {
-  width: 200px;
-  height: 200px;
-  top: 40%;
-  left: 60%;
-
-  background: radial-gradient(
-    circle,
-    #60a5fa,
-    transparent 70%
-  );
-
-  opacity: 0.05;
-
-  animation: floatShape 18s ease-in-out infinite 2s;
-}
-
-/* Top-left shape */
-.shape-4 {
-  width: 150px;
-  height: 150px;
-  top: 20%;
-  left: 10%;
-
-  background: radial-gradient(
-    circle,
-    #818cf8,
-    transparent 70%
-  );
-
-  opacity: 0.04;
-
-  animation: floatShape 22s ease-in-out infinite 4s;
-}
-
-/* Bottom-right shape */
-.shape-5 {
-  width: 100px;
-  height: 100px;
-  bottom: 30%;
-  right: 20%;
-
-  background: radial-gradient(
-    circle,
-    #93c5fd,
-    transparent 70%
-  );
-
-  opacity: 0.04;
-
-  animation: floatShape 15s ease-in-out infinite 1s;
-}
-
-/* Floating animation */
-@keyframes floatShape {
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-
-  25% {
-    transform: translate(40px, -40px) scale(1.1);
-  }
-
-  50% {
-    transform: translate(-30px, 30px) scale(0.9);
-  }
-
-  75% {
-    transform: translate(30px, 20px) scale(1.05);
-  }
-}
-
-/* =========================================================
-   CONTAINER
-   ========================================================= */
-
-.signup-container {
-  width: 100%;
-  max-width: 540px;
-
+.auth-brand-text {
   display: flex;
   flex-direction: column;
-
-  position: relative;
-  z-index: 1;
+  gap: 1px;
+  line-height: 1.15;
 }
 
-/* =========================================================
-   CARD
-   ========================================================= */
-
-.signup-card {
-  width: 100%;
-
-  background: rgba(255, 255, 255, 0.95);
-
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-
-  border-radius: 22px;
-
-  padding: 42px 40px;
-
-  box-shadow:
-    0 25px 70px rgba(15, 45, 75, 0.22),
-    0 5px 20px rgba(15, 45, 75, 0.08);
-
-  border: 1px solid rgba(255, 255, 255, 0.75);
-
-  animation: fadeInUp 0.6s ease-out;
+.auth-brand-text span {
+  color: #285783;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
 }
 
-/* Card entrance */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.auth-brand-text small {
+  font-size: 8.5px;
+  color: var(--auth-muted);
+  font-weight: 600;
+  letter-spacing: 0.8px;
 }
 
-/* =========================================================
-   HEADER
-   ========================================================= */
+/* ---------- HEADING ---------- */
 
-.signup-header {
-  text-align: center;
-  margin-bottom: 28px;
+.auth-heading {
+  margin-bottom: 16px;
 }
 
-.signup-header h2 {
-  font-size: 27px;
-  font-weight: 700;
-
-  color: #1a3a5c;
-
-  margin-bottom: 7px;
-
-  letter-spacing: -0.3px;
+.auth-heading h1 {
+  color: var(--auth-heading);
+  font-size: 26px;
+  font-weight: 750;
+  letter-spacing: -0.5px;
+  margin: 0 0 4px;
+  line-height: 1.2;
 }
 
-.signup-header p {
+.auth-heading p {
+  color: var(--auth-text);
   font-size: 14px;
-  color: #6a8a9a;
-
+  margin: 0;
   line-height: 1.5;
 }
 
-/* =========================================================
-   FORM LAYOUT
-   ========================================================= */
+/* ---------- ERROR ---------- */
 
-.form-row {
-  display: grid;
-
-  grid-template-columns: 1fr 1fr;
-
-  gap: 14px;
+.auth-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: #FFF1F1;
+  border: 1px solid #FAD5D5;
+  color: #C24141;
+  font-size: 12px;
+  line-height: 1.4;
 }
 
-/*
-   Email + Phone row
-*/
-.contact-row {
-  margin-bottom: 0;
-}
-
-/*
-   Password + Confirm Password row
-*/
-.password-row {
-  margin-bottom: 0;
-}
-
-/* =========================================================
-   INPUT GROUP
-   ========================================================= */
-
-.input-group {
-  margin-bottom: 16px;
-}
-
-.input-group.half {
-  margin-bottom: 16px;
-}
-
-/* Labels */
-.input-group label {
-  display: block;
-
-  font-size: 12.5px;
-  font-weight: 600;
-
-  color: #294766;
-
-  margin-bottom: 7px;
-
-  letter-spacing: 0.1px;
-}
-
-/* =========================================================
-   INPUTS
-   ========================================================= */
-
-.input-group input,
-.role-select {
-  width: 100%;
-  height: 46px;
-
-  padding: 0 14px;
-
-  border: 1.5px solid #dce3ec;
-
-  border-radius: 11px;
-
-  font-family: inherit;
-  font-size: 14px;
-
-  background: rgba(248, 250, 253, 0.95);
-
-  color: #1a3a5c;
-
-  transition:
-    border-color 0.25s ease,
-    box-shadow 0.25s ease,
-    background 0.25s ease,
-    transform 0.15s ease;
-}
-
-/* Hover */
-.input-group input:hover,
-.role-select:hover {
-  border-color: #b8c7d9;
-
-  background: #ffffff;
-}
-
-/* Focus */
-.input-group input:focus,
-.role-select:focus {
-  outline: none;
-
-  border-color: #4f46e5;
-
-  background: #ffffff;
-
-  box-shadow:
-    0 0 0 4px rgba(79, 70, 229, 0.09);
-}
-
-/* Disabled */
-.input-group input:disabled,
-.role-select:disabled {
-  opacity: 0.6;
-
-  cursor: not-allowed;
-
-  background: #f1f4f8;
-}
-
-/* Placeholder */
-.input-group input::placeholder {
-  color: #aab8c5;
-
-  opacity: 1;
-}
-
-/* =========================================================
-   SELECT DROPDOWN
-   ========================================================= */
-
-.role-select {
-  appearance: none;
-  -webkit-appearance: none;
-
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a6a7a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-
-  background-repeat: no-repeat;
-
-  background-position:
-    right 14px center;
-
-  padding-right: 38px;
-
-  cursor: pointer;
-}
-
-.role-select option {
-  padding: 8px;
-}
-
-/* =========================================================
-   BUTTON
-   ========================================================= */
-
-.signup-button {
-  width: 100%;
-  height: 46px;
-
-  padding: 0 13px;
-
-  background: linear-gradient(
-    135deg,
-    #4f46e5,
-    #4338ca
-  );
-
-  color: #ffffff;
-
-  border: none;
-
-  border-radius: 11px;
-
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 600;
-
-  cursor: pointer;
-
+.auth-error-icon {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  border-radius: 50%;
+  background: #FCE0E0;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  gap: 8px;
-
-  margin-top: 6px;
-
-  box-shadow:
-    0 5px 14px rgba(100, 99, 117, 0.2);
+  font-weight: 800;
+  font-size: 10px;
 }
 
-/* Button hover */
-.signup-button:hover:not(:disabled) {
-  background: linear-gradient(
-    135deg,
-    #4338ca,
-    #3730a3
-  );
+/* ---------- FORM ---------- */
 
-
-  box-shadow:
-    0 8px 22px rgba(79, 70, 229, 0.28);
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-/* Button active */
-.signup-button:active:not(:disabled) {
-  transform: translateY(0);
-
-  box-shadow:
-    0 4px 10px rgba(159, 159, 168, 0.2);
+.auth-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
-/* Disabled button */
-.signup-button:disabled {
-  opacity: 0.7;
-
-  cursor: not-allowed;
-
-  transform: none;
-
-  box-shadow: none;
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
 }
 
-/* =========================================================
-   SPINNER
-   ========================================================= */
-
-.spinner {
-  display: inline-block;
-
-  width: 18px;
-  height: 18px;
-
-  border: 2px solid rgba(255, 255, 255, 0.3);
-
-  border-radius: 50%;
-
-  border-top-color: #ffffff;
-
-  animation: spin 0.6s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* =========================================================
-   ERROR MESSAGE
-   ========================================================= */
-
-.error-message {
-  background: #fff1f2;
-
-  color: #c0392b;
-
-  padding: 11px 14px;
-
-  border-radius: 9px;
-
+.auth-field label {
+  color: #475569;
   font-size: 13px;
-
-  line-height: 1.4;
-
-  margin-bottom: 18px;
-
-  border-left: 3px solid #c0392b;
-
-  box-shadow:
-    0 2px 8px rgba(192, 57, 43, 0.05);
-}
-
-/* =========================================================
-   FOOTER
-   ========================================================= */
-
-.signup-footer {
-  margin-top: 21px;
-
-  text-align: center;
-
-  padding-top: 18px;
-
-  border-top: 1px solid #e8edf2;
-}
-
-.signup-footer p {
-  font-size: 14px;
-
-  color: #6a8a9a;
-
-  line-height: 1.5;
-}
-
-.signup-footer a {
-  color: #4f46e5;
-
   font-weight: 600;
-
-  text-decoration: none;
-
-  transition: color 0.2s ease;
+  letter-spacing: 0.2px;
 }
 
-.signup-footer a:hover {
-  color: #4338ca;
+.auth-field input {
+  width: 100%;
+  height: 46px;
+  padding: 0 12px;
+  border: 1px solid var(--auth-border);
+  border-radius: 8px;
+  background: var(--auth-input-bg);
+  color: var(--auth-heading);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
 
+.auth-field input::placeholder {
+  color: #A3AFBF;
+  font-size: 12px;
+}
+
+.auth-field input:hover:not(:disabled) {
+  border-color: #B8CEE7;
+}
+
+.auth-field input:focus {
+  background: #FFFFFF;
+  border-color: var(--auth-primary);
+  box-shadow: 0 0 0 3px rgba(52, 120, 200, 0.10);
+}
+
+.auth-field input:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* ---------- PHONE ---------- */
+
+.auth-phone {
+  position: relative;
+  width: 100%;
+}
+
+.auth-phone input {
+  padding-right: 40px;
+}
+
+.auth-phone-prefix {
+  position: absolute;
+  right: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748B;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  pointer-events: none;
+}
+
+/* ---------- SUBMIT ---------- */
+
+.auth-submit {
+  width: 100%;
+  height: 50px;
+  margin-top: 4px;
+  border: none;
+  border-radius: 8px;
+  background: var(--auth-primary);
+  color: #FFFFFF;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition:
+    background 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.auth-submit:hover:not(:disabled) {
+  background: var(--auth-primary-hover);
+  box-shadow: 0 5px 15px rgba(52, 120, 200, 0.20);
+  transform: translateY(-1px);
+}
+
+.auth-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.auth-submit:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.auth-arrow {
+  font-size: 16px;
+  line-height: 1;
+  transition: transform 0.18s ease;
+}
+
+.auth-submit:hover .auth-arrow {
+  transform: translateX(3px);
+}
+
+/* ---------- SPINNER ---------- */
+
+.auth-spinner {
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #FFFFFF;
+  border-radius: 50%;
+  animation: authSpin 0.7s linear infinite;
+}
+
+@keyframes authSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------- FOOTER ---------- */
+
+.auth-footer {
+  text-align: center;
+  margin-top: 14px;
+  color: var(--auth-text);
+  font-size: 12px;
+}
+
+.auth-footer a {
+  color: var(--auth-primary);
+  font-weight: 700;
+  text-decoration: none;
+  margin-left: 4px;
+}
+
+.auth-footer a:hover {
+  color: var(--auth-primary-hover);
   text-decoration: underline;
 }
 
-/* =========================================================
-   TABLETS
-   ========================================================= */
+/* ---------- BOTTOM NOTE ---------- */
 
-@media (max-width: 768px) {
-
-  .signup-wrapper {
-    padding: 24px 16px;
-  }
-
-  .signup-container {
-    max-width: 520px;
-  }
-
-  .signup-card {
-    padding: 36px 28px;
-  }
-
+.auth-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #F1F5F9;
+  color: var(--auth-muted);
+  font-size: 10px;
+  font-weight: 500;
 }
 
-/* =========================================================
-   MOBILE
-   ========================================================= */
+.auth-note-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4A90D9;
+}
 
-@media (max-width: 640px) {
+/* ---------- RESPONSIVE ---------- */
 
-  .signup-wrapper {
+@media (max-width: 560px) {
+  .auth-page {
     padding: 16px 12px;
-
-    align-items: center;
+    align-items: flex-start;
   }
 
-  .signup-card {
-    padding: 28px 20px;
-
-    border-radius: 17px;
-  }
-
-  .signup-header {
-    margin-bottom: 23px;
-  }
-
-  .signup-header h2 {
-    font-size: 23px;
-  }
-
-  .signup-header p {
-    font-size: 13px;
-  }
-
-  /*
-     Stack all two-column rows
-     on mobile.
-  */
-  .form-row {
-    grid-template-columns: 1fr;
-
-    gap: 0;
-  }
-
-  .input-group.half {
-    margin-bottom: 14px;
-  }
-
-  .input-group input,
-  .role-select {
-    height: 44px;
-
-    padding: 0 12px;
-
-    font-size: 13px;
-  }
-
-  .input-group label {
-    font-size: 12px;
-
-    margin-bottom: 6px;
-  }
-
-  .signup-button {
-    height: 44px;
-
-    font-size: 14px;
-  }
-
-  /* Background shapes */
-  .shape-1 {
-    width: 300px;
-    height: 300px;
-  }
-
-  .shape-2 {
-    width: 200px;
-    height: 200px;
-  }
-
-  .shape-3,
-  .shape-4,
-  .shape-5 {
-    display: none;
-  }
-
-}
-
-/* =========================================================
-   SMALL PHONES
-   ========================================================= */
-
-@media (max-width: 380px) {
-
-  .signup-wrapper {
-    padding: 12px 8px;
-  }
-
-  .signup-card {
-    padding: 21px 14px;
-
-    border-radius: 13px;
-  }
-
-  .signup-header {
-    margin-bottom: 18px;
-  }
-
-  .signup-header h2 {
-    font-size: 19px;
-  }
-
-  .signup-header p {
-    font-size: 12px;
-  }
-
-  .input-group {
-    margin-bottom: 12px;
-  }
-
-  .input-group.half {
-    margin-bottom: 12px;
-  }
-
-  .input-group label {
-    font-size: 11.5px;
-
-    margin-bottom: 5px;
-  }
-
-  .input-group input,
-  .role-select {
-    height: 40px;
-
-    padding: 0 10px;
-
-    font-size: 12px;
-
-    border-radius: 8px;
-  }
-
-  .signup-button {
-    height: 40px;
-
-    font-size: 13px;
-  }
-
-  .error-message {
-    padding: 8px 10px;
-
-    font-size: 12px;
-
-    margin-bottom: 14px;
-  }
-
-  .signup-footer {
-    margin-top: 14px;
-
-    padding-top: 14px;
-  }
-
-  .signup-footer p {
-    font-size: 12px;
-  }
-
-}
-
-/* =========================================================
-   LANDSCAPE PHONES
-   ========================================================= */
-
-@media (max-height: 700px) and (orientation: landscape) {
-
-  .signup-wrapper {
-    padding: 16px 12px;
-
-    align-items: center;
-  }
-
-  .signup-card {
-    padding: 24px 20px;
-
+  .auth-card {
+    padding: 20px 18px 16px;
     border-radius: 14px;
   }
 
-  .signup-header {
-    margin-bottom: 16px;
-  }
-
-  .signup-header h2 {
+  .auth-heading h1 {
     font-size: 20px;
   }
 
-  .signup-header p {
+  .auth-heading p {
     font-size: 12px;
   }
 
-  .input-group {
-    margin-bottom: 10px;
+  .auth-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
   }
 
-  .input-group.half {
-    margin-bottom: 10px;
+  .auth-form {
+    gap: 10px;
   }
 
-  .input-group input,
-  .role-select {
+  .auth-field input {
     height: 40px;
-
-    padding: 0 10px;
-
-    font-size: 12px;
   }
 
-  .signup-button {
-    height: 40px;
-
-    font-size: 14px;
-
-    margin-top: 4px;
+  .auth-submit {
+    height: 42px;
   }
-
-  .signup-footer {
-    margin-top: 12px;
-
-    padding-top: 12px;
-  }
-
-  .password-row {
-    margin-bottom: 0;
-  }
-
 }
-
-/* =========================================================
-   CUSTOM SCROLLBAR
-   ========================================================= */
-
-::-webkit-scrollbar {
-  width: 5px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(30, 80, 130, 0.25);
-
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(30, 80, 130, 0.4);
-}
-
-/* =========================================================
-   ACCESSIBILITY
-   ========================================================= */
-
-.input-group input:focus-visible,
-.role-select:focus-visible,
-.signup-button:focus-visible,
-.signup-footer a:focus-visible {
-  outline: 2px solid rgba(79, 70, 229, 0.35);
-
-  outline-offset: 2px;
-}
-
-/* =========================================================
-   REDUCED MOTION
-   ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  .auth-submit,
+  .auth-field input,
+  .auth-footer a {
+    transition: none;
   }
-
+  .auth-spinner {
+    animation-duration: 2s;
+  }
 }

@@ -1,12 +1,14 @@
-// src/pages/SignUpPage.jsx
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { logActivity } from '../lib/logActivity';
-import '/src/styles/SignUpPage.css';
+import lguLogo from '../assets/lgu-official-seal.png';
+import chrmoLogo from '../assets/chrmo-official-seal.png';
+import '../styles/SignUpPage.css';
 
 function SignUpPage() {
   const navigate = useNavigate();
+
   const [firstName, setFirstName] = useState('');
   const [surname, setSurname] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -19,35 +21,33 @@ function SignUpPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
-    if (!firstName || !surname || !email || !password) {
+
+    if (!firstName.trim() || !surname.trim() || !email.trim() || !password) {
       setError('Please fill in all required fields');
       return;
     }
-
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
-
     if (password.length < 6) {
       setError('Password must be at least 6 characters');
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     try {
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: email.trim(),
         password,
         options: {
           data: {
-            first_name: firstName,
-            surname: surname,
-            full_name: `${firstName} ${surname}`,
-            phone_number: phoneNumber,
-            role: 'applicant'   // ✅ locked — always applicant
+            first_name: firstName.trim(),
+            surname: surname.trim(),
+            full_name: `${firstName.trim()} ${surname.trim()}`,
+            phone_number: phoneNumber.trim(),
+            role: 'applicant'
           }
         }
       });
@@ -59,15 +59,13 @@ function SignUpPage() {
       }
 
       if (data.user) {
-        console.log('Sign up successful:', data.user);
-
         const { error: applicantError } = await supabase
           .from('applicants')
           .insert({
             id: data.user.id,
-            full_name: `${firstName} ${surname}`,
-            email: email,
-            phone: phoneNumber
+            full_name: `${firstName.trim()} ${surname.trim()}`,
+            email: email.trim(),
+            phone: phoneNumber.trim()
           });
 
         if (applicantError) {
@@ -77,10 +75,9 @@ function SignUpPage() {
           return;
         }
 
-        // ✅ log the registration
         await logActivity(
           'user_registered',
-          `New applicant registered: ${firstName} ${surname}`,
+          `New applicant registered: ${firstName.trim()} ${surname.trim()}`,
           { user: data.user }
         );
 
@@ -94,134 +91,140 @@ function SignUpPage() {
   };
 
   return (
-    <div className="signup-page">  
-      <div className="signup-wrapper">
-        {/* Background Shapes */}
-        <div className="shapes">
-          <div className="shape shape-1"></div>
-          <div className="shape shape-2"></div>
-          <div className="shape shape-3"></div>
-          <div className="shape shape-4"></div>
-          <div className="shape shape-5"></div>
-        </div>
+    <div className="auth-page">
+      <div className="auth-card">
 
-        <div className="signup-container">
-          <div className="signup-card">
-            <div className="signup-header">
-              <h2>Create Account</h2>
-              <p>Join CHRMO Iligan's HR Management Portal</p>
-            </div>
-
-            {error && <div className="error-message">{error}</div>}
-
-            <form onSubmit={handleSubmit}>
-              <div className="form-row">
-                <div className="input-group half">
-                  <label>First Name </label>
-                  <input
-                    type="text"
-                    placeholder="John"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    disabled={isLoading}
-                  />
-                </div>
-
-                <div className="input-group half">
-                  <label>Surname </label>
-                  <input
-                    type="text"
-                    placeholder="Doe"
-                    value={surname}
-                    onChange={(e) => setSurname(e.target.value)}
-                    disabled={isLoading}
-                  />
-                </div>
-              </div>
-
-              <div className="form-row contact-row">
-                <div className="input-group half">
-                  <label>Email Address</label>
-                  <input
-                    type="email"
-                    placeholder="johan@gmail.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={isLoading}
-                  />
-                </div>
-
-                <div className="input-group half">
-                  <label>Phone Number</label>
-                  <div style={{ position: 'relative' }}>
-                    <input
-                      type="tel"
-                      placeholder="0912 345 6789"
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      disabled={isLoading}
-                      style={{ paddingRight: '45px' }}
-                    />
-                    <span style={{
-                      position: 'absolute',
-                      right: '12px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      pointerEvents: 'none',
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      color: '#6c757d',
-                      letterSpacing: '0.5px'
-                    }}>
-                      PH
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="form-row password-row">
-                <div className="input-group half">
-                  <label>Password </label>
-                  <input
-                    type="password"
-                    placeholder="Min 6 characters"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={isLoading}
-                  />
-                </div>
-
-                <div className="input-group half">
-                  <label>Confirm Password </label>
-                  <input
-                    type="password"
-                    placeholder="Confirm password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    disabled={isLoading}
-                  />
-                </div>
-              </div>
-
-              <button type="submit" className="signup-button" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <span className="spinner"></span>
-                    Creating account...
-                  </>
-                ) : (
-                  'Create Account'
-                )}
-              </button>
-            </form>
-
-            <div className="signup-footer">
-              <p>
-                Already have an account? <Link to="/login">Login here</Link>
-              </p>
-            </div>
+                <div className="auth-brand">
+          <div className="auth-logos">
+            <img src={chrmoLogo} alt="CHRMO" />
+          </div>
+          <div className="auth-brand-text">
+            <span>CHRMO ILIGAN</span>
+            <small>Human Resource Management Portal</small>
           </div>
         </div>
+
+        <div className="auth-heading">
+          <h1>Create Account</h1>
+          <p>Join the portal to browse and apply for positions.</p>
+        </div>
+
+        {error && (
+          <div className="auth-error">
+            <span className="auth-error-icon">!</span>
+            <span>{error}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} noValidate className="auth-form">
+
+          <div className="auth-row">
+            <div className="auth-field">
+              <label htmlFor="firstName">First Name</label>
+              <input
+                id="firstName"
+                type="text"
+                placeholder="John"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                disabled={isLoading}
+                autoComplete="given-name"
+              />
+            </div>
+            <div className="auth-field">
+              <label htmlFor="surname">Surname</label>
+              <input
+                id="surname"
+                type="text"
+                placeholder="Doe"
+                value={surname}
+                onChange={(e) => setSurname(e.target.value)}
+                disabled={isLoading}
+                autoComplete="family-name"
+              />
+            </div>
+          </div>
+
+          <div className="auth-row">
+            <div className="auth-field">
+              <label htmlFor="email">Email</label>
+              <input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+                autoComplete="email"
+              />
+            </div>
+            <div className="auth-field">
+              <label htmlFor="phoneNumber">Phone</label>
+              <div className="auth-phone">
+                <input
+                  id="phoneNumber"
+                  type="tel"
+                  placeholder="0912 345 6789"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  disabled={isLoading}
+                  autoComplete="tel"
+                />
+                <span className="auth-phone-prefix">PH</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="auth-row">
+            <div className="auth-field">
+              <label htmlFor="password">Password</label>
+              <input
+                id="password"
+                type="password"
+                placeholder="Min 6 characters"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+                autoComplete="new-password"
+              />
+            </div>
+            <div className="auth-field">
+              <label htmlFor="confirmPassword">Confirm Password</label>
+              <input
+                id="confirmPassword"
+                type="password"
+                placeholder="Re-enter password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                disabled={isLoading}
+                autoComplete="new-password"
+              />
+            </div>
+          </div>
+
+          <button type="submit" className="auth-submit" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <span className="auth-spinner" />
+                Creating account...
+              </>
+            ) : (
+              <>
+                Create Account
+              </>
+            )}
+          </button>
+        </form>
+
+        <div className="auth-footer">
+          Already have an account? <Link to="/login">Login here</Link>
+        </div>
+
+        <div className="auth-note">
+          <span className="auth-note-dot" />
+          Secure applicant registration
+        </div>
+
       </div>
     </div>
   );

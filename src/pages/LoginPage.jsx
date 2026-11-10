@@ -106,7 +106,7 @@ function LoginPage() {
             <div className="hero-content">
               <h2>Streamlining Public Service Through <span className="highlight">Digital Transformation</span></h2>
               <p className="subtitle">
-                CHRMO Iligan - committed to building a competent, professional, and responsive workforce for public service excellence.
+                 Committed to building a competent, professional, and responsive workforce for public service excellence.
               </p>
             </div>
 
