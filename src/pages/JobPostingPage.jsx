@@ -326,8 +326,8 @@ const [showEditConfirm, setShowEditConfirm] = useState(false);
     qualifications: {
       education: 4,
       eligibility: "professional",
-      training: 0,
-      workExperience: 0,
+      training: 40,
+      workExperience: 5,
       competency: ""
     },
     instructions: "",
