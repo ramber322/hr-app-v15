@@ -17,8 +17,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-background-image: linear-gradient( 135deg, #ABDCFF 10%, #0396FF 100%);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+background: linear-gradient(135deg, #F8FAFC 0%, #EDF2F7 100%);  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 20px;
   position: relative;
   overflow: hidden;
@@ -101,7 +100,7 @@ background-image: linear-gradient( 135deg, #ABDCFF 10%, #0396FF 100%);
 
 /* ===== LANDING SECTION - 70% ===== */
 .landing-section {
-  background-image: linear-gradient( 135deg, #ABDCFF 10%, #ABDCFF 100%);
+  background: linear-gradient(135deg, #F8FAFC 0%, #EDF2F7 100%);
   padding: 35px 40px;
   display: flex;
   align-items: center;
