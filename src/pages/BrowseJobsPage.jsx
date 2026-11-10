@@ -358,29 +358,33 @@ const handleSubmitApplication = async () => {
     }
 
     // ═══════════════════════════════════════════════════════════
-    // STEP 2: Validate required docs exist in profile  ← 🆕 NEW
-    // ═══════════════════════════════════════════════════════════
-    const requiredDocs = selectedJob.required_docs || {};
-    const missingDocs = [];
+// STEP 2: Validate required docs exist in PROFILE OR FORM
+// ═══════════════════════════════════════════════════════════
+const requiredDocs = selectedJob.required_docs || {};
+const missingDocs = [];
 
-    if (!profileDocs?.pds_file_url) {
-      missingDocs.push('Personal Data Sheet (PDS)');
-    }
-    
+// PDS can come from profile OR from the form upload
+const hasPds =
+  !!profileDocs?.pds_file_url ||
+  !!application.documents?.pds;
 
-    if (missingDocs.length > 0) {
-      const confirmed = window.confirm(
-        `This job requires the following documents that are missing from your profile:\n\n` +
-        `${missingDocs.map(d => '• ' + d).join('\n')}\n\n` +
-        `Would you like to go to your Profile page to upload them?`
-      );
-      if (confirmed) {
-        setShowJobDetailsModal(false);
-        navigate('/applicant/profile');
-      }
-      setSubmitting(false);
-      return;
-    }
+if (!hasPds) {
+  missingDocs.push('Personal Data Sheet (PDS)');
+}
+
+if (missingDocs.length > 0) {
+  const confirmed = window.confirm(
+    `This job requires the following documents that are missing from your profile:\n\n` +
+    `${missingDocs.map(d => '• ' + d).join('\n')}\n\n` +
+    `Would you like to go to your Profile page to upload them?`
+  );
+  if (confirmed) {
+    setShowJobDetailsModal(false);
+    navigate('/applicant/profile');
+  }
+  setSubmitting(false);
+  return;
+}
 
     // ═══════════════════════════════════════════════════════════
     // STEP 3: Check if already applied (unchanged)
