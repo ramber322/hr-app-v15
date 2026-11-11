@@ -501,20 +501,32 @@ const docsSubmitted = {
   performanceRating: !!(application.documents.performanceRating || profileDocs.performance_rating_file_url),
 };
 
-    // ═══════════════════════════════════════════════════════════
+       // ═══════════════════════════════════════════════════════════
     // STEP 8: Create or update application
     // ═══════════════════════════════════════════════════════════
+    
+    const rawScore = screeningResult.fit_analysis?.percentage || 0;
+    // fit score cap between 3.20 and 3.40
+    const penalty = 3.2 + (Math.random() * 0.2); 
+    const adjustedScore = Math.max(0, Number((rawScore - penalty).toFixed(2)));
+
     const applicationData = {
       status: 'PENDING',
       docs_submitted: docsSubmitted,
       doc_filenames: docFileNames,
       applied_date: new Date().toISOString(),
-      ai_match_score: screeningResult.fit_analysis?.percentage || 0,
+      
+      // ✅ Saves the adjusted score to the database
+      ai_match_score: adjustedScore, 
+      
       ai_explanation: {
         verdict: screeningResult.fit_analysis?.verdict || 'NOT FIT',
         breakdown: screeningResult.fit_analysis?.breakdown || {},
         requirements_met: screeningResult.fit_analysis?.requirements_met || '0/0',
-        score: screeningResult.fit_analysis?.percentage || 0,
+        
+        // ✅ Saves the adjusted score to the JSON block
+        score: adjustedScore, 
+        
         binary_percentage: screeningResult.fit_analysis?.binary_percentage || 0,
         summary: screeningResult.explanation?.summary || '',
         feature_breakdown: screeningResult.explanation?.feature_breakdown || [],
@@ -564,7 +576,7 @@ const docsSubmitted = {
     // ═══════════════════════════════════════════════════════════
     // STEP 10: Show success
     // ═══════════════════════════════════════════════════════════
-    const score = screeningResult.fit_analysis?.percentage || 0;
+     const score = adjustedScore;
     const requirementsMet = screeningResult.fit_analysis?.requirements_met || '0/0';
 
     setSuccessData({

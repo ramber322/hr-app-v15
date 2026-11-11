@@ -366,12 +366,12 @@ const handleWithdraw = async (application) => {
   };
 
   // Helper to get the display score (hybrid score from ai_explanation.percentage or fallback to ai_match_score)
-  const getDisplayScore = (app) => {
-    if (app.ai_explanation?.percentage !== undefined && app.ai_explanation?.percentage !== null) {
-      return app.ai_explanation.percentage;
-    }
-    return app.ai_match_score;
-  };
+const getDisplayScore = (app) => {
+  if (app.ai_explanation?.percentage !== undefined && app.ai_explanation?.percentage !== null) {
+    return app.ai_explanation.percentage;
+  }
+  return app.ai_match_score || 0;
+};
 
   // Helper to get the requirements met display
   const getRequirementsMetDisplay = (app) => {
