@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 import { supabase } from '../lib/supabase';
 import { PatternBackground } from '../components/PatternBackground';
 import Loader from '../components/Loader';
-import { CircularCheckSuccessIcon } from "../components/icons/CustomIcons";
+import { BasiconsDocumentIcon, CircularCheckSuccessIcon } from "../components/icons/CustomIcons";
 
 // ─── Helper: format file size ─────────────────────────
 const formatFileSize = (bytes) => {
@@ -785,7 +785,17 @@ if (!allowedTypes.includes(file.type)) {
 
           {/* ═══════════ My Documents ═══════════ */}
           <div className="profile-card">
-            <h3 className="card-title">📄 My Documents</h3>
+           <h3 
+  className="card-title" 
+  style={{ 
+    display: 'flex', 
+    alignItems: 'center', 
+    gap: '10px' 
+  }}
+>
+  <BasiconsDocumentIcon size={24} color="#15152c" /> 
+  My Documents
+</h3>
             <div className="card-content">
               <p style={{ fontSize: '13px', color: '#6c757d', marginTop: 0, marginBottom: '20px' }}>
                 Upload your documents once, they'll be reused across all your job applications. You can update them anytime.

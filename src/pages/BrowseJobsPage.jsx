@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 import { supabase } from "../lib/supabase";
 import { getJobPostings } from "../services/jobService";
 import '../styles/BrowseJobsPage.css';
-import { CalendarColoredIcon, ApplicantCheckboxIcon } from "../components/icons/CustomIcons";
+import { CalendarColoredIcon, ApplicantCheckboxIcon, BasiconsFolderIcon, BasiconsDocumentIcon, BasiconsBriefcaseIcon } from "../components/icons/CustomIcons";
 import calendarLogo from '../assets/icon-calendar.png'
 import calendarminimalLogo from '../assets/calendar-minimal-icon.png';
 import Loader from '../components/Loader';
@@ -866,7 +866,7 @@ const docsSubmitted = {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: '0 2px 6px rgba(37,99,235,0.12)', flexShrink: 0
           }}>
-            <span style={{ fontSize: '18px' }}>💼</span>
+            <span style={{ fontSize: '18px' }}><BasiconsBriefcaseIcon size={20} color="#4F46E5" /></span>
           </div>
           <div>
             <div style={{ fontSize: '11px', fontWeight: 700, color: '#1a3a5c', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '2px' }}>
@@ -1078,7 +1078,17 @@ const docsSubmitted = {
 {/* ═══ PROFILE DOCUMENTS ═══ */}
 {/* ═══ DOCUMENTS ═══ */}
 <div className="required-docs-section">
-  <h4>📄 Submit Documents</h4>
+ <h4 style={{ 
+  display: 'flex', 
+  alignItems: 'center', 
+  gap: '8px', 
+  fontSize: '13px', 
+  fontWeight: 600, 
+  color: '#1a3a5c',
+  margin: '0 0 8px 0'
+}}>
+  <BasiconsDocumentIcon size={16} color="#15152c" /> Submit Documents
+</h4>
   <p className="info-text" style={{ marginBottom: '12px' }}>
     Documents from your profile are used by default.{' '}
     
@@ -1122,19 +1132,26 @@ const docsSubmitted = {
         display: 'inline-flex',
         alignItems: 'center',
         gap: '6px',
-        background: '#4F46E5',
-        color: 'white',
+         background: '#eef2ff',        /* ✅ White background */
+    color: '#475569',             /* ✅ Dark gray text */
+    border: '1px solid #CBD5E1',  /* ✅ Subtle gray border */
         padding: '8px 14px',
         borderRadius: '6px',
         fontSize: '12px',
         fontWeight: 600,
         cursor: 'pointer',
-        transition: 'background 0.2s ease'
+        boxShadow: '0 1px 2px rgba(0,0,0,0.05)' /* Tiny shadow to pop it off the gray card */
       }}
-      onMouseEnter={(e) => e.currentTarget.style.background = '#4338ca'}
-      onMouseLeave={(e) => e.currentTarget.style.background = '#4F46E5'}
+      onMouseEnter={(e) => {
+    e.currentTarget.style.background = '#e0e7ff';
+    e.currentTarget.style.borderColor = '#94A3B8';
+  }}
+      onMouseLeave={(e) => {
+    e.currentTarget.style.background = '#eef2ff';
+    e.currentTarget.style.borderColor = '#CBD5E1';
+  }}
     >
-      📁 {application.documents.pds
+      <BasiconsFolderIcon size={14} color="#383654" />{application.documents.pds
         ? 'Replace file'
         : (applicantProfile?.pds_file_url ? 'Upload different file' : 'Upload PDS')}
       <input
@@ -1157,7 +1174,7 @@ const docsSubmitted = {
         color: '#4F46E5',
         maxWidth: '100%'
       }}>
-        <span>📄 {application.documents.pds.name}</span>
+        <span>{application.documents.pds.name}</span>
         <button
           type="button"
           onClick={() => handleRemoveFile('pds')}
@@ -1187,7 +1204,7 @@ const docsSubmitted = {
       padding: '6px 10px',
       borderRadius: '6px'
     }}>
-      ⚠ No PDS found on your profile. Upload one to apply for this job.
+       No PDS found on your profile. Upload one to apply for this job.
     </div>
   )}
 </div>
@@ -1221,20 +1238,20 @@ const docsSubmitted = {
           display: 'inline-flex',
           alignItems: 'center',
           gap: '6px',
-          background: '#eef2ff',
-          color: '#4F46E5',
+          background: '#eef2ff',        /* ✅ White background */
+    color: '#475569',             /* ✅ Dark gray text */
+    border: '1px solid #CBD5E1',  /* ✅ Subtle gray border */
           padding: '8px 14px',
           borderRadius: '6px',
           fontSize: '12px',
           fontWeight: 600,
           cursor: 'pointer',
-          border: '1px solid #c7d2fe',
           transition: 'background 0.2s ease'
         }}
         onMouseEnter={(e) => e.currentTarget.style.background = '#e0e7ff'}
         onMouseLeave={(e) => e.currentTarget.style.background = '#eef2ff'}
       >
-        📁 {application.documents.transcript
+        <BasiconsFolderIcon size={14} color="#383654" /> {application.documents.transcript
           ? 'Replace file'
           : (applicantProfile?.tor_file_url ? 'Upload different file' : 'Upload file')}
         <input
@@ -1308,20 +1325,20 @@ const docsSubmitted = {
           display: 'inline-flex',
           alignItems: 'center',
           gap: '6px',
-          background: '#eef2ff',
-          color: '#4F46E5',
+               background: '#eef2ff',        /* ✅ White background */
+    color: '#475569',             /* ✅ Dark gray text */
+    border: '1px solid #CBD5E1',  /* ✅ Subtle gray border */
           padding: '8px 14px',
           borderRadius: '6px',
           fontSize: '12px',
           fontWeight: 600,
           cursor: 'pointer',
-          border: '1px solid #c7d2fe',
           transition: 'background 0.2s ease'
         }}
         onMouseEnter={(e) => e.currentTarget.style.background = '#e0e7ff'}
         onMouseLeave={(e) => e.currentTarget.style.background = '#eef2ff'}
       >
-        📁 {application.documents.performanceRating
+        <BasiconsFolderIcon size={14} color="#383654" /> {application.documents.performanceRating
           ? 'Replace file'
           : (applicantProfile?.performance_rating_file_url ? 'Upload different file' : 'Upload file')}
         <input

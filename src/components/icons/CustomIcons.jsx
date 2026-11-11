@@ -2045,3 +2045,44 @@ export function BasiconsBulbIcon({ size = 24, className = "", color = "currentCo
     </svg>
   );
 }
+
+export function BasiconsDocumentIcon({ size = 24, className = "", color = "currentColor", style = {} }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      style={{ color, flexShrink: 0, ...style }}
+    >
+      <path
+        d="M13.5 2.50491V7.5C13.5 8.05228 13.9477 8.5 14.5 8.5H19.4951M8 17H15M8 13H15M8 9H9M18 22H6C4.89543 22 4 21.1046 4 20V4C4 2.89543 4.89543 2 6 2H12.1716C12.702 2 13.2107 2.21071 13.5858 2.58579L19.4142 8.41421C19.7893 8.78929 20 9.29799 20 9.82843V20C20 21.1046 19.1046 22 18 22Z"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function BasiconsFolderIcon({ size = 24, className = "", color = "currentColor", style = {} }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 512 512"
+      fill="none"
+      className={className}
+      style={{ color, flexShrink: 0, ...style }}
+    >
+      <path
+        d="M408 96H252.11a23.9 23.9 0 0 1-13.31-4L211 73.41A55.77 55.77 0 0 0 179.89 64H104a56.06 56.06 0 0 0-56 56v24h416c0-30.88-25.12-48-56-48M423.75 448H88.25a56 56 0 0 1-55.93-55.15L16.18 228.11v-.28A48 48 0 0 1 64 176h384.1a48 48 0 0 1 47.8 51.83v.28l-16.22 164.74A56 56 0 0 1 423.75 448m56.15-221.45"
+        fill={color}
+      />
+    </svg>
+  );
+}
