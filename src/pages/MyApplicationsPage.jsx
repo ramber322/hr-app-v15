@@ -5,7 +5,7 @@ import { supabase } from "../lib/supabase";
 import "../styles/MyApplicationsPage.css";
 import locationLogo from '../assets/icon-location.png';
 import calendarminimalLogo from '../assets/calendar-minimal-icon.png';
-import { CircularCheckSuccessIcon } from "../components/icons/CustomIcons";
+import { CircularCheckSuccessIcon, BasiconsDocumentIcon, BasiconsBriefcaseIcon } from "../components/icons/CustomIcons";
 import Loader from '../components/Loader';
 
 export default function MyApplicationsPage() {
@@ -633,333 +633,266 @@ const getDisplayScore = (app) => {
 )}
 
 
-      {/* Modal */}
+          {/* Modal */}
       {showDetailsModal && selectedApplication && (
         <div className="modal-overlay" onClick={() => setShowDetailsModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Application Details</h3>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '720px' }}>
+            
+            {/* ── HEADER ── */}
+            <div className="modal-header" style={{
+              background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+              borderBottom: '1px solid #bfdbfe',
+              borderRadius: '16px 16px 0 0',
+              padding: '20px 24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '12px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{
+                  width: '40px', height: '40px', borderRadius: '10px', background: 'white',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 2px 6px rgba(37,99,235,0.12)', flexShrink: 0
+                }}>
+                  <BasiconsBriefcaseIcon size={20} color="#4F46E5" />
+                </div>
+                <div>
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#1a3a5c', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '2px' }}>
+                    Application Details
+                  </div>
+                  <h2 style={{ margin: 0, fontSize: '18px', color: '#1a1f36', fontWeight: 700 }}>
+                    {selectedApplication.job_postings?.position_title}
+                  </h2>
+                </div>
+              </div>
               <button className="close-modal" onClick={() => setShowDetailsModal(false)}>×</button>
             </div>
+
             <div className="modal-body">
-              <div className="detail-section">
-                <h4>Position Information</h4>
+              
+              {/* ── POSITION INFORMATION ── */}
+              <div className="detail-section" style={{ background: '#f8fafc', border: '1px solid #e8ebf5', borderRadius: '12px', padding: '18px 20px', marginBottom: '16px' }}>
+                <h4 style={{ fontSize: '12px', fontWeight: 700, color: '#1a3a5c', letterSpacing: '0.8px', textTransform: 'uppercase', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ color: '#4F46E5' }}>■</span> Position Information
+                </h4>
                 <div className="detail-grid">
                   <div><span className="detail-label">Position Title</span><span className="detail-value">{selectedApplication.job_postings?.position_title}</span></div>
                   <div><span className="detail-label">Place of Assignment</span><span className="detail-value">{selectedApplication.job_postings?.place_of_assignment}</span></div>
                   <div><span className="detail-label">Item No.</span><span className="detail-value">{selectedApplication.job_postings?.item_no || 'N/A'}</span></div>
-                  <div><span className="detail-label">Salary Grade</span><span className="detail-value">{selectedApplication.job_postings?.salary_grade || 'N/A'}</span></div>
-                  <div><span className="detail-label">Monthly Salary</span><span className="detail-value">{formatSalary(selectedApplication.job_postings?.monthly_salary)}</span></div>
-                  <div><span className="detail-label">Closing Date</span><span className="detail-value">{formatDate(selectedApplication.job_postings?.closing_date)}</span></div>
-                </div>
-              </div>
-
-            
-             
-{/* AI Assessment - Redesigned */}
-{(
-  selectedApplication.ai_match_score != null ||
-  selectedApplication.ai_explanation?.percentage != null
-) && (
-  <div className="detail-section ai-detail-section">
-
-    <div className="ai-assessment-card">
-
-      {/* HEADER */}
-      <div className="ai-header">
-        <div className="ai-header-left">
-          <div className="ai-icon">
-            ✦
-          </div>
-
-          <div>
-            <h4> Assessment</h4>
-            <p>AI-assisted candidate evaluation</p>
-          </div>
-        </div>
-
-        <div className="analysis-status">
-          <span className="status-dot"></span>
-          Analysis Complete
-        </div>
-      </div>
-
-      {/* SCORE HERO */}
-      <div className="ai-score-card">
-
-        <div className="score-content">
-
-          <div
-            className="score-circle"
-            style={{
-              "--score": `${
-                Math.min(
-                  100,
-                  Math.max(0, Number(getDisplayScore(selectedApplication)) || 0)
-                )
-              }%`
-            }}
-          >
-            <div className="score-circle-inner">
-              <span className="score-number">
-                {getDisplayScore(selectedApplication)}
-                <small>%</small>
-              </span>
-
-              <span className="score-label">
-                Fit Score
-              </span>
-            </div>
-          </div>
-
-          <div className="score-details">
-
-            <span className={`match-badge ${
-              Number(getDisplayScore(selectedApplication)) >= 80
-                ? "strong"
-                : Number(getDisplayScore(selectedApplication)) >= 60
-                ? "moderate"
-                : "low"
-            }`}>
-              {
-                Number(getDisplayScore(selectedApplication)) >= 80
-                  ? "Strong Match"
-                  : Number(getDisplayScore(selectedApplication)) >= 60
-                  ? "Moderate Match"
-                  : "Low Match"
-              }
-            </span>
-
-            <h3>Candidate Compatibility</h3>
-
-            <p>
-              {
-                Number(getDisplayScore(selectedApplication)) >= 80
-                  ? "High compatibility with the specified job requirements."
-                  : Number(getDisplayScore(selectedApplication)) >= 60
-                  ? "Some qualifications may require further review."
-                  : "Several qualifications require further evaluation."
-              }
-            </p>
-
-            {getRequirementsMetDisplay(selectedApplication) != null && (
-              <div className="score-note">
-                <span>ⓘ</span>
-                {getRequirementsMetDisplay(selectedApplication)} requirements met
-              </div>
-            )}
-
-          </div>
-        </div>
-      </div>
-
-      {/* QUALIFICATION BREAKDOWN */}
-      {selectedApplication.ai_explanation?.breakdown &&
-        Object.keys(selectedApplication.ai_explanation.breakdown).some(
-          key => !(
-            selectedApplication.ai_explanation.breakdown[key].status &&
-            selectedApplication.ai_explanation.breakdown[key].status
-              .toUpperCase().includes("NOT REQUIRED")
-          )
-        ) && (
-
-        <div className="ai-breakdown-section">
-
-          <div className="ai-section-heading">
-            <div>
-              <h5>Qualification Breakdown</h5>
-              <p>Assessment of individual job qualifications</p>
-            </div>
-
-            <span className="section-tag">
-              {Object.entries(
-                selectedApplication.ai_explanation.breakdown
-              ).filter(([key, value]) =>
-                !(value.status &&
-                  value.status.toUpperCase().includes("NOT REQUIRED"))
-              ).length} Criteria
-            </span>
-          </div>
-
-          <div className="ai-breakdown-list">
-
-            {Object.entries(
-              selectedApplication.ai_explanation.breakdown
-            ).map(([key, value]) => {
-
-              if (
-                value.status &&
-                value.status.toUpperCase().includes("NOT REQUIRED")
-              ) {
-                return null;
-              }
-
-              const isMet = isRequirementMet(value);
-
-              const isNotMet = value.status &&
-                value.status.toUpperCase().includes("NOT MET");
-
-              const displayText = getBreakdownDisplay(key, value);
-
-              const rawProgress = Number(value.progress);
-
-              const hasProgress =
-                value.progress !== null &&
-                value.progress !== undefined &&
-                Number.isFinite(rawProgress);
-
-              const progressPercent = hasProgress
-                ? Math.min(
-                    100,
-                    Math.max(0, rawProgress <= 1
-                      ? rawProgress * 100
-                      : rawProgress)
-                  )
-                : 0;
-
-              return (
-                <div className="ai-breakdown-row" key={key}>
-
-                  <div className="ai-breakdown-top">
-
-                    <div className="ai-breakdown-name">
-                      <span className="ai-breakdown-dot"></span>
-                      {key}
-                    </div>
-
-                    <span className={`ai-breakdown-status ${
-                      isNotMet
-                        ? "not-met"
-                        : isMet
-                        ? "met"
-                        : "partial"
-                    }`}>
-                      {isNotMet
-                        ? "Needs Review"
-                        : isMet
-                        ? "Requirement Met"
-                        : "Partial Match"}
+                  <div>
+                    <span className="detail-label">Salary Grade</span>
+                    <span className="detail-value" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: '#eef2ff', borderRadius: '6px', fontWeight: 700, color: '#1a3a5c' }}>
+                      {selectedApplication.job_postings?.salary_grade || 'N/A'}
                     </span>
-
                   </div>
+                 
 
-                  {hasProgress && (
-                    <div className="ai-progress-track">
-                      <div
-                        className={`ai-progress-fill ${
-                          isNotMet
-                            ? "progress-warning"
-                            : isMet
-                            ? "progress-success"
-                            : "progress-partial"
-                        }`}
-                        style={{
-                          width: `${progressPercent}%`
-                        }}
-                      />
-                    </div>
-                  )}
+                 
+                 
 
-                  <div className="ai-breakdown-description">
-                    {displayText}
-                  </div>
-
-                </div>
-              );
-            })}
-
-          </div>
-        </div>
-      )}
-
-     
-
-      {/* RECOMMENDATIONS */}
-      {selectedApplication.ai_explanation?.recommendations?.length > 0 && (
-        <div className="ai-recommendations redesigned-recommendations">
-
-          <div className="recommendations-heading">
-            <span className="recommendations-icon">ⓘ</span>
-
-            <div>
-              <h5>Recommendations</h5>
-              <p>Areas that may need further attention</p>
-            </div>
-          </div>
-
-          <ul>
-            {selectedApplication.ai_explanation.recommendations.map(
-              (rec, idx) => (
-                <li key={idx}>
-                  {formatEducationRecommendation(rec)}
-                </li>
-              )
-            )}
-          </ul>
-
-        </div>
-      )}
-
-      {/* DISCLAIMER */}
-      <div className="ai-disclaimer">
-        <span className="disclaimer-icon">ⓘ</span>
-
-        <p>
-          <strong>Important Notice:</strong> This generated
-          assessment is intended to assist in evaluating
-          applicant qualifications. It does not constitute
-          a final hiring decision. Assessment results should
-          be reviewed and validated by authorized HR personnel.
-        </p>
-      </div>
-
-
-
-    </div>
-  </div>
-)}
-
-
-
-
-    {/* Qualifications Required */}
-<div className="detail-section">
-  <h4>Qualifications Required</h4>
-  <div className="detail-grid">
-    <div>
-      <span className="detail-label">Education</span>
-      <span className="detail-value">
-        {(() => {
-          const val = selectedApplication.job_postings?.required_education;
-          if (val === undefined || val === null || val === '') return 'None Required';
-          const num = parseInt(val);
-          return !isNaN(num) ? EDUCATION_LABELS[num] || val : val;
-        })()}
-      </span>
-    </div>
-    <div>
-      <span className="detail-label">Eligibility</span>
-      <span className="detail-value">
-        {selectedApplication.job_postings?.required_eligibility || 'None Required'}
-      </span>
-    </div>
-    <div>
-      <span className="detail-label">Training</span>
-      <span className="detail-value">
-        {selectedApplication.job_postings?.required_training || 'None Required'}
-      </span>
-    </div>
-    <div>
-      <span className="detail-label">Work Experience</span>
-      <span className="detail-value">
-        {selectedApplication.job_postings?.required_work_experience || 'None Required'} 
-      </span>
-    </div>
-  </div>
+                 <div>
+  <span className="detail-label">Closing Date</span>
+  <span 
+    className="detail-value" 
+    style={{ 
+      display: 'flex', 
+      alignItems: 'center', 
+      gap: '8px', 
+      marginTop: '4px',
+      fontWeight: 600, 
+      color: '#1a3a5c' /* standard dark text */
+    }}
+  >
+    {/* ✅ Glowing dot */}
+    <span style={{ 
+      width: '6px', 
+      height: '6px', 
+      borderRadius: '50%', 
+      background: '#f70909', /* amber */
+      boxShadow: '0 0 0 3px rgba(245, 158, 11, 0.2)', /* glow */
+      flexShrink: 0 
+    }} />
+    {formatDate(selectedApplication.job_postings?.closing_date)}
+  </span>
 </div>
 
-              <div className="detail-section">
-                <h4>Application Status</h4>
+                      <div>
+                    <span className="detail-label">Monthly Salary</span>
+                    <span className="detail-value" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: '#eef2ff', borderRadius: '6px', fontWeight: 700, color: '#1a3a5c' }}>
+                      {formatSalary(selectedApplication.job_postings?.monthly_salary)}
+                    </span>
+                  </div>
+                </div>
+
+                
+              </div>
+
+              {/* ── AI ASSESSMENT (Kept your exact logic, wrapped in your CSS) ── */}
+              {(selectedApplication.ai_match_score != null || selectedApplication.ai_explanation?.percentage != null) && (
+                <div className="detail-section ai-detail-section" style={{ background: '#f8fafc', border: '1px solid #e8ebf5', borderRadius: '12px', padding: '18px 20px', marginBottom: '16px' }}>
+                  <div className="ai-assessment-card">
+                    <div className="ai-header">
+                      <div className="ai-header-left">
+                        <div className="ai-icon">✦</div>
+                        <div>
+                          <h4>Assessment</h4>
+                          <p>AI-assisted candidate evaluation</p>
+                        </div>
+                      </div>
+                      <div className="analysis-status">
+                        <span className="status-dot"></span>
+                        Analysis Complete
+                      </div>
+                    </div>
+
+                    <div className="ai-score-card">
+                      <div className="score-content">
+                        <div
+                          className="score-circle"
+                          style={{
+                            "--score": `${Math.min(100, Math.max(0, Number(getDisplayScore(selectedApplication)) || 0))}%`
+                          }}
+                        >
+                          <div className="score-circle-inner">
+                            <span className="score-number">
+                              {getDisplayScore(selectedApplication)}<small>%</small>
+                            </span>
+                            <span className="score-label">Fit Score</span>
+                          </div>
+                        </div>
+
+                        <div className="score-details">
+                          <span className={`match-badge ${
+                            Number(getDisplayScore(selectedApplication)) >= 80 ? "strong" :
+                            Number(getDisplayScore(selectedApplication)) >= 60 ? "moderate" : "low"
+                          }`}>
+                            {Number(getDisplayScore(selectedApplication)) >= 80 ? "Strong Match" :
+                             Number(getDisplayScore(selectedApplication)) >= 60 ? "Moderate Match" : "Low Match"}
+                          </span>
+                          <h3>Candidate Compatibility</h3>
+                          <p>
+                            {Number(getDisplayScore(selectedApplication)) >= 80 ? "High compatibility with the specified job requirements." :
+                             Number(getDisplayScore(selectedApplication)) >= 60 ? "Some qualifications may require further review." :
+                             "Several qualifications require further evaluation."}
+                          </p>
+                          {getRequirementsMetDisplay(selectedApplication) != null && (
+                            <div className="score-note">
+                              <span>ⓘ</span> {getRequirementsMetDisplay(selectedApplication)} requirements met
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Qualification Breakdown */}
+                    {selectedApplication.ai_explanation?.breakdown &&
+                      Object.keys(selectedApplication.ai_explanation.breakdown).some(
+                        key => !(selectedApplication.ai_explanation.breakdown[key].status && selectedApplication.ai_explanation.breakdown[key].status.toUpperCase().includes("NOT REQUIRED"))
+                      ) && (
+                      <div className="ai-breakdown-section">
+                        <div className="ai-section-heading">
+                          <div>
+                            <h5>Qualification Breakdown</h5>
+                            <p>Assessment of individual job qualifications</p>
+                          </div>
+                          <span className="section-tag">
+                            {Object.entries(selectedApplication.ai_explanation.breakdown).filter(([key, value]) =>
+                              !(value.status && value.status.toUpperCase().includes("NOT REQUIRED"))
+                            ).length} Criteria
+                          </span>
+                        </div>
+
+                        <div className="ai-breakdown-list">
+                          {Object.entries(selectedApplication.ai_explanation.breakdown).map(([key, value]) => {
+                            if (value.status && value.status.toUpperCase().includes("NOT REQUIRED")) return null;
+                            const isMet = isRequirementMet(value);
+                            const isNotMet = value.status && value.status.toUpperCase().includes("NOT MET");
+                            const displayText = getBreakdownDisplay(key, value);
+                            const rawProgress = Number(value.progress);
+                            const hasProgress = value.progress !== null && value.progress !== undefined && Number.isFinite(rawProgress);
+                            const progressPercent = hasProgress ? Math.min(100, Math.max(0, rawProgress <= 1 ? rawProgress * 100 : rawProgress)) : 0;
+
+                            return (
+                              <div className="ai-breakdown-row" key={key}>
+                                <div className="ai-breakdown-top">
+                                  <div className="ai-breakdown-name">
+                                    <span className="ai-breakdown-dot"></span> {key}
+                                  </div>
+                                  <span className={`ai-breakdown-status ${isNotMet ? "not-met" : isMet ? "met" : "partial"}`}>
+                                    {isNotMet ? "Needs Review" : isMet ? "Requirement Met" : "Partial Match"}
+                                  </span>
+                                </div>
+                                {hasProgress && (
+                                  <div className="ai-progress-track">
+                                    <div className={`ai-progress-fill ${isNotMet ? "progress-warning" : isMet ? "progress-success" : "progress-partial"}`} style={{ width: `${progressPercent}%` }} />
+                                  </div>
+                                )}
+                                <div className="ai-breakdown-description">{displayText}</div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Recommendations */}
+                    {selectedApplication.ai_explanation?.recommendations?.length > 0 && (
+                      <div className="ai-recommendations redesigned-recommendations">
+                        <div className="recommendations-heading">
+                          <span className="recommendations-icon">ⓘ</span>
+                          <div>
+                            <h5>Recommendations</h5>
+                            <p>Areas that may need further attention</p>
+                          </div>
+                        </div>
+                        <ul>
+                          {selectedApplication.ai_explanation.recommendations.map((rec, idx) => (
+                            <li key={idx}>{formatEducationRecommendation(rec)}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Disclaimer */}
+                    <div className="ai-disclaimer">
+                      <span className="disclaimer-icon">ⓘ</span>
+                      <p>
+                        <strong>Important Notice:</strong> This generated assessment is intended to assist in evaluating applicant qualifications. It does not constitute a final hiring decision. Assessment results should be reviewed and validated by authorized HR personnel.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── QUALIFICATIONS REQUIRED ── */}
+              <div className="detail-section" style={{ background: '#f8fafc', border: '1px solid #e8ebf5', borderRadius: '12px', padding: '18px 20px', marginBottom: '16px' }}>
+                <h4 style={{ fontSize: '12px', fontWeight: 700, color: '#1a3a5c', letterSpacing: '0.8px', textTransform: 'uppercase', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ color: '#0d9488' }}>■</span> Qualifications Required
+                </h4>
+                <div className="detail-grid">
+                  <div>
+                    <span className="detail-label">Education</span>
+                    <span className="detail-value">
+                      {(() => {
+                        const val = selectedApplication.job_postings?.required_education;
+                        if (val === undefined || val === null || val === '') return 'None Required';
+                        const num = parseInt(val);
+                        return !isNaN(num) ? EDUCATION_LABELS[num] || val : val;
+                      })()}
+                    </span>
+                  </div>
+                  <div><span className="detail-label">Eligibility</span><span className="detail-value">{selectedApplication.job_postings?.required_eligibility || 'None Required'}</span></div>
+                  <div><span className="detail-label">Training</span><span className="detail-value">{selectedApplication.job_postings?.required_training || 'None Required'}</span></div>
+                  <div><span className="detail-label">Work Experience</span><span className="detail-value">{selectedApplication.job_postings?.required_work_experience || 'None Required'}</span></div>
+                </div>
+              </div>
+
+              {/* ── APPLICATION STATUS ── */}
+              <div className="detail-section" style={{ background: '#f8fafc', border: '1px solid #e8ebf5', borderRadius: '12px', padding: '18px 20px', marginBottom: '16px' }}>
+                <h4 style={{ fontSize: '12px', fontWeight: 700, color: '#1a3a5c', letterSpacing: '0.8px', textTransform: 'uppercase', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ color: '#f59e0b' }}>■</span> Application Status
+                </h4>
                 <div className="detail-grid">
                   <div><span className="detail-label">Current Status</span><span className="detail-value">{selectedApplication.status}</span></div>
                   <div><span className="detail-label">Date Applied</span><span className="detail-value">{formatDate(selectedApplication.applied_date)}</span></div>
@@ -967,20 +900,40 @@ const getDisplayScore = (app) => {
                 </div>
               </div>
 
-              <div className="detail-section">
-                <h4>Documents Submitted</h4>
-                <div className="documents-list">
-                  {selectedApplication.docs_submitted?.pds && <span className="doc-check">✓ Personal Data Sheet (PDS)</span>}
-                  {selectedApplication.docs_submitted?.transcript && <span className="doc-check">✓ Transcript of Records</span>}
-                  {selectedApplication.docs_submitted?.performanceRating && <span className="doc-check">✓ Performance Rating</span>}
-                </div>
-              </div>
+              {/* ── DOCUMENTS SUBMITTED ── */}
+<div className="detail-section" style={{ background: '#f8fafc', border: '1px solid #e8ebf5', borderRadius: '12px', padding: '18px 20px', marginBottom: '16px' }}>
+  <h4 style={{ fontSize: '12px', fontWeight: 700, color: '#1a3a5c', letterSpacing: '0.8px', textTransform: 'uppercase', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+    {/* ✅ Replaced square with glowing dot */}
+    <span style={{ 
+      width: '8px', 
+      height: '8px', 
+      borderRadius: '50%', 
+      background: '#6366f1',
+      boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.15)',
+      flexShrink: 0 
+    }} /> 
+    Documents Submitted
+  </h4>
+  <div className="documents-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: '#1a1f36' }}>
+    {selectedApplication.docs_submitted?.pds && <span className="doc-check" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ color: '#10b981' }}>✓</span> Personal Data Sheet (PDS)</span>}
+    {selectedApplication.docs_submitted?.transcript && <span className="doc-check" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ color: '#10b981' }}>✓</span> Transcript of Records</span>}
+    {selectedApplication.docs_submitted?.performanceRating && <span className="doc-check" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ color: '#10b981' }}>✓</span> Performance Rating</span>}
+  </div>
+</div>
 
+              {/* Close Button */}
               <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
-                <button className="close-btn" onClick={() => setShowDetailsModal(false)} style={{ flex: 1, padding: '10px', background: 'white', border: '1px solid #dee2e6', borderRadius: '8px', cursor: 'pointer', fontWeight: 500 }}>
+                <button 
+                  className="close-btn" 
+                  onClick={() => setShowDetailsModal(false)} 
+                  style={{ flex: 1, padding: '12px', background: '#f3f4f6', color: '#4a5568', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, transition: 'background 0.2s ease' }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = '#e5e7eb'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = '#f3f4f6'}
+                >
                   Close
                 </button>
               </div>
+
             </div>
           </div>
         </div>

@@ -6,7 +6,7 @@ import Navbar from "../components/Navbar";
 import { notifyStatusChange } from '../services/notificationService';
 import { supabase } from "../lib/supabase";
 import "../styles/JobCandidatesPage.css";
-import { DocumentCheckIcon, BasiconsUserBookIcon, CircularCheckSuccessIcon, NewspaperIcon, CheckInterviewIconDashboard, CheckMarkSquareInterviewIcon,  PdfIcon, CheckboxMassIcon, ReverseTabArrowIcon, JusticePlumpIcon, CheckSquareIcon, MagnifyingGlassPlumpIcon } from "../components/icons/CustomIcons";
+import { DocumentCheckIcon, BasiconsUserBookIcon,BasiconsUserBoxIcon,  CircularCheckSuccessIcon, NewspaperIcon, CheckInterviewIconDashboard, CheckMarkSquareInterviewIcon,  PdfIcon, CheckboxMassIcon, ReverseTabArrowIcon, JusticePlumpIcon, CheckSquareIcon, MagnifyingGlassPlumpIcon } from "../components/icons/CustomIcons";
 import JobCandidateButton from "../components/JobCandidateButton";
 import communityLogo from '../assets/community3-icon.png';
 import calendarminimalLogo from '../assets/calendar-minimal-icon.png';
@@ -1933,258 +1933,257 @@ border: `1px solid ${isFit ? '#bbf7d0' : '#fde68a'}`
   alignItems: 'center', gap: '10px', animation: 'slideIn 0.3s ease' }}> <CircularCheckSuccessIcon size={19}
    style={{ color: 'white' }} /> <span>{bulkUpdateSuccessMessage}</span> </div> )}
 
-      {/* Application Details Modal */}
-      {showDetailsModal && selectedApplication && (
-        <div className="modal-overlay" onClick={() => setShowDetailsModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Candidate Details</h3>
-              <button className="close-modal" onClick={() => setShowDetailsModal(false)}>×</button>
-            </div>
-            <div className="modal-body">
-              <div className="detail-section">
-                <h4>Profile</h4>
-                <div className="detail-grid">
-                  <div><span className="detail-label">Name</span><span className="detail-value">{selectedApplication.applicant_name}</span></div>
-                  <div><span className="detail-label">Email</span><span className="detail-value">{selectedApplication.applicant_email}</span></div>
-                  <div><span className="detail-label">Rank</span><span className="detail-value">#{selectedApplication.rank}</span></div>
-                  <div><span className="detail-label">AI Match Score</span><span className="detail-value">{selectedApplication.ai_match_score}%</span></div>
-                </div>
-              </div>
-
-              <div className="detail-section">
-  <h4> Submitted Documents</h4>
-  <ul className="docs-list" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-    <li style={{ 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'space-between',
-      padding: '8px 0',
-      borderBottom: '1px solid #f0f0f0'
-    }}>
-      <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        {selectedApplication.docs_submitted?.pds ? (
-          <DocumentCheckIcon size={26} color="#16e19d" />
-        ) : (
-          <span style={{ color: '#ef4444', fontSize: '14px' }}>✕</span>
-        )}
-        Personal Data Sheet (PDS)
-      </span>
-      {selectedApplication.docs_submitted?.pds && (
-       <JobCandidateButton 
-  onClick={() => viewDocument(
-    selectedApplication.job_id,
-    selectedApplication.applicant_id,
-    'pds',
-    'PDS'
-  )}
-/>
-      )}
-    </li>
-    
-    {job?.required_docs?.transcriptRecords && (
-      <li style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'space-between',
-        padding: '8px 0',
-        borderBottom: '1px solid #f0f0f0'
-      }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {selectedApplication.docs_submitted?.transcript ? (
-            <DocumentCheckIcon size={26} color="#16e19d" />
-          ) : (
-            <span style={{ color: '#ef4444', fontSize: '20px', marginLeft: '5px' }}>✕</span>
-          )}
-          Transcript of Records
-        </span>
-        {selectedApplication.docs_submitted?.transcript && (
-        <JobCandidateButton 
-  onClick={() => viewDocument(
-    selectedApplication.job_id,
-    selectedApplication.applicant_id,
-    'transcript',
-    'Transcript'
-  )}
-/>
-
-        )}
-      </li>
-    )}
-    
-    {job?.required_docs?.performanceRating && (
-      <li style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'space-between',
-        padding: '8px 0',
-        borderBottom: '1px solid #f0f0f0'
-      }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {selectedApplication.docs_submitted?.performanceRating ? (
-            <DocumentCheckIcon size={26} color="#16e19d" />
-          ) : (
-            <span style={{ color: '#ef4444', fontSize: '20px',  marginLeft: '5px' }}>✕</span>
-          )}
-          Performance Rating
-        </span>
-        {selectedApplication.docs_submitted?.performanceRating && (
-       <JobCandidateButton 
-  onClick={() => viewDocument(
-    selectedApplication.job_id,
-    selectedApplication.applicant_id,
-    'performanceRating',
-    'Performance Rating'
-  )}
-/>
-        )}
-      </li>
-    )}
-  </ul>
-</div>
-
-              <div className="detail-section">
-                <h4>Qualifications</h4>
-                <div className="detail-grid">
-                  <div><span className="detail-label">Education</span><span className="detail-value">{selectedApplication.education}</span></div>
-                  <div><span className="detail-label">Eligibility</span><span className="detail-value">{selectedApplication.eligibility || 'None'}</span></div>
-                  <div><span className="detail-label">Training</span><span className="detail-value">{selectedApplication.training}</span></div>
-                  <div><span className="detail-label">Experience</span><span className="detail-value">{selectedApplication.experience}</span></div>
-                </div>
-              </div>
-
-              <div className="detail-section">
-                <h4>Application Details</h4>
-                <div className="detail-grid">
-                  <div><span className="detail-label">Status</span>
-                    <div className="status-update-section">
-                      <select 
-                        value={selectedApplication.status}
-                        onChange={(e) => {
-                          const newStatus = e.target.value;
-                          setSelectedApplication({...selectedApplication, status: newStatus});
-                        }}
-                      >
-                        <option value="PENDING">Pending</option>
-                        <option value="REVIEWING">Under Review</option>
-                        <option value="SHORTLISTED">Shortlisted</option>
-                        <option value="INTERVIEW_SCHEDULED">For Interview</option>
-                        <option value="HIRED">Hired</option>
-                        <option value="NOT_SELECTED">Not Selected</option>
-                        <option value="REJECTED">Rejected</option>
-                      </select>
-                      <button 
-  onClick={() => {
-    setPendingStatus(selectedApplication.status);
-    setShowStatusConfirm(true);
-  }}
-  disabled={updatingStatus}
-  style={{
-    padding: '8px 16px',
-    background: updatingStatus ? '#4338ca' : '#4F46E5',
-    color: 'white',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: updatingStatus ? 'not-allowed' : 'pointer',
-    fontWeight: '500',
-    transition: 'background 0.2s ease',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    opacity: updatingStatus ? 0.7 : 1
-  }}
-  onMouseEnter={(e) => {
-    if (!updatingStatus) e.currentTarget.style.background = '#4338ca';
-  }}
-  onMouseLeave={(e) => {
-    if (!updatingStatus) e.currentTarget.style.background = '#4F46E5';
-  }}
->
-  {updatingStatus ? (
-    <>
-      <span className="spinner" />
-      Updating...
-    </>
-  ) : (
-    'Update'
-  )}
-</button>
-                    </div>
-                  </div>
-                  <div><span className="detail-label">Applied Date</span><span className="detail-value">{formatDate(selectedApplication.applied_date)}</span></div>
-                </div>
-              </div>
-
-              <div className="modal-actions">
-                <button 
-  className="close-btn" 
-  onClick={() => setShowDetailsModal(false)}
-  style={{
-    background: '#D3F0F9',
-    color: '#1a3a5c',
-    border: 'none',
-    borderRadius: '6px',
-    padding: '8px 24px',
-    cursor: 'pointer',
-    fontWeight: '500',
-    transition: 'background 0.2s ease'
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.background = '#b8e4f0';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.background = '#D3F0F9';
-  }}
->
-  Close
-</button>
-                {selectedApplication.status !== 'INTERVIEW_SCHEDULED' && (
-                  <button 
-      className="schedule-btn" 
-      onClick={() => {
-        setPendingStatus('INTERVIEW_SCHEDULED');
-        setShowStatusConfirm(true);
-      }}
-      disabled={updatingStatus}
-      style={{
-        display: 'inline-flex',
+    {/* Application Details Modal */}
+{showDetailsModal && selectedApplication && (
+  <div className="modal-overlay" onClick={() => setShowDetailsModal(false)}>
+    <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '720px' }}>
+      
+      {/* ── HEADER ── */}
+      <div className="modal-header" style={{
+        background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+        borderBottom: '1px solid #bfdbfe',
+        borderRadius: '16px 16px 0 0',
+        padding: '20px 24px',
+        display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
-        gap: '8px',
-        padding: '8px 16px',
-        background: updatingStatus ? '#4338ca' : '#4F46E5',
-        color: 'white',
-        border: 'none',
-        borderRadius: '6px',
-        cursor: updatingStatus ? 'not-allowed' : 'pointer',
-        fontWeight: '500',
-        transition: 'background 0.2s ease',
-        opacity: updatingStatus ? 0.7 : 1
-      }}
-      onMouseEnter={(e) => {
-        if (!updatingStatus) e.currentTarget.style.background = '#4338ca';
-      }}
-      onMouseLeave={(e) => {
-        if (!updatingStatus) e.currentTarget.style.background = '#4F46E5';
-      }}
-    >
-      <img 
-        src={calendarminimalLogo} 
-        alt="Calendar" 
-        style={{ 
-          width: 18, 
-          height: 18, 
-          filter: 'brightness(0) saturate(100%) invert(100%) brightness(100%)' 
-        }} 
-      />
-      Schedule Interview
-    </button>
-                )}
-              </div>
+        justifyContent: 'space-between',
+        gap: '12px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{
+  width: '40px', height: '40px', borderRadius: '10px', background: 'white',
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  boxShadow: '0 2px 6px rgba(37,99,235,0.12)', flexShrink: 0
+}}>
+  <BasiconsUserBoxIcon size={28} color="#4F46E5" />
+</div>
+          <div>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: '#1a3a5c', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '2px' }}>
+              Candidate Details
+            </div>
+            <h2 style={{ margin: 0, fontSize: '18px', color: '#1a1f36', fontWeight: 700 }}>
+              {selectedApplication.applicant_name}
+            </h2>
+          </div>
+        </div>
+        <button className="close-modal" onClick={() => setShowDetailsModal(false)}>×</button>
+      </div>
+
+      <div className="modal-body">
+
+        {/* ── PROFILE ── */}
+        <div className="detail-section" style={{ background: '#f8fafc', border: '1px solid #e8ebf5', borderRadius: '12px', padding: '18px 20px', marginBottom: '16px' }}>
+          <h4 style={{ fontSize: '12px', fontWeight: 700, color: '#1a3a5c', letterSpacing: '0.8px', textTransform: 'uppercase', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4F46E5', boxShadow: '0 0 0 3px rgba(79, 70, 229, 0.15)', flexShrink: 0 }} />
+            Profile
+          </h4>
+          <div className="detail-grid">
+            <div><span className="detail-label">Name</span><span className="detail-value">{selectedApplication.applicant_name}</span></div>
+            <div><span className="detail-label">Email</span><span className="detail-value">{selectedApplication.applicant_email}</span></div>
+            <div><span className="detail-label">Rank</span><span className="detail-value">#{selectedApplication.rank}</span></div>
+            <div>
+              <span className="detail-label">AI Match Score</span>
+              <span className="detail-value" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '4px 12px', background: '#eef2ff', border: '1px solid #c7d2fe', borderRadius: '999px', fontWeight: 700, color: '#4F46E5', fontSize: '13px' }}>
+                {selectedApplication.ai_match_score}%
+              </span>
             </div>
           </div>
         </div>
-      )}
+
+        {/* ── SUBMITTED DOCUMENTS ── */}
+        <div className="detail-section" style={{ background: '#f8fafc', border: '1px solid #e8ebf5', borderRadius: '12px', padding: '18px 20px', marginBottom: '16px' }}>
+          <h4 style={{ fontSize: '12px', fontWeight: 700, color: '#1a3a5c', letterSpacing: '0.8px', textTransform: 'uppercase', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#0d9488', boxShadow: '0 0 0 3px rgba(13, 148, 136, 0.15)', flexShrink: 0 }} />
+            Submitted Documents
+          </h4>
+          <ul className="docs-list" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            {/* PDS */}
+            <li style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #e8ebf5' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#1a1f36' }}>
+                {selectedApplication.docs_submitted?.pds ? (
+                  <DocumentCheckIcon size={22} color="#10b981" />
+                ) : (
+                  <span style={{ color: '#ef4444', fontSize: '14px', fontWeight: 'bold' }}>✕</span>
+                )}
+                Personal Data Sheet (PDS)
+              </span>
+              {selectedApplication.docs_submitted?.pds && (
+                <JobCandidateButton onClick={() => viewDocument(selectedApplication.job_id, selectedApplication.applicant_id, 'pds', 'PDS')} />
+              )}
+            </li>
+
+            {/* TOR */}
+            {job?.required_docs?.transcriptRecords && (
+              <li style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #e8ebf5' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#1a1f36' }}>
+                  {selectedApplication.docs_submitted?.transcript ? (
+                    <DocumentCheckIcon size={22} color="#10b981" />
+                  ) : (
+                    <span style={{ color: '#ef4444', fontSize: '14px', fontWeight: 'bold' }}>✕</span>
+                  )}
+                  Transcript of Records
+                </span>
+                {selectedApplication.docs_submitted?.transcript && (
+                  <JobCandidateButton onClick={() => viewDocument(selectedApplication.job_id, selectedApplication.applicant_id, 'transcript', 'Transcript')} />
+                )}
+              </li>
+            )}
+
+            {/* Performance Rating */}
+            {job?.required_docs?.performanceRating && (
+              <li style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #e8ebf5' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#1a1f36' }}>
+                  {selectedApplication.docs_submitted?.performanceRating ? (
+                    <DocumentCheckIcon size={22} color="#10b981" />
+                  ) : (
+                    <span style={{ color: '#ef4444', fontSize: '14px', fontWeight: 'bold' }}>✕</span>
+                  )}
+                  Performance Rating
+                </span>
+                {selectedApplication.docs_submitted?.performanceRating && (
+                  <JobCandidateButton onClick={() => viewDocument(selectedApplication.job_id, selectedApplication.applicant_id, 'performanceRating', 'Performance Rating')} />
+                )}
+              </li>
+            )}
+          </ul>
+        </div>
+
+        {/* ── QUALIFICATIONS ── */}
+        <div className="detail-section" style={{ background: '#f8fafc', border: '1px solid #e8ebf5', borderRadius: '12px', padding: '18px 20px', marginBottom: '16px' }}>
+          <h4 style={{ fontSize: '12px', fontWeight: 700, color: '#1a3a5c', letterSpacing: '0.8px', textTransform: 'uppercase', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#6366f1', boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.15)', flexShrink: 0 }} />
+            Qualifications
+          </h4>
+          <div className="detail-grid">
+            <div><span className="detail-label">Education</span><span className="detail-value">{selectedApplication.education}</span></div>
+            <div><span className="detail-label">Eligibility</span><span className="detail-value">{selectedApplication.eligibility || 'None'}</span></div>
+            <div><span className="detail-label">Training</span><span className="detail-value">{selectedApplication.training}</span></div>
+            <div><span className="detail-label">Experience</span><span className="detail-value">{selectedApplication.experience}</span></div>
+          </div>
+        </div>
+
+        {/* ── APPLICATION DETAILS (Status Update) ── */}
+        <div className="detail-section" style={{ background: '#f8fafc', border: '1px solid #e8ebf5', borderRadius: '12px', padding: '18px 20px', marginBottom: '16px' }}>
+          <h4 style={{ fontSize: '12px', fontWeight: 700, color: '#1a3a5c', letterSpacing: '0.8px', textTransform: 'uppercase', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f59e0b', boxShadow: '0 0 0 3px rgba(245, 158, 11, 0.15)', flexShrink: 0 }} />
+            Application Details
+          </h4>
+          <div className="detail-grid">
+            <div>
+              <span className="detail-label">Status</span>
+              <div className="status-update-section" style={{ display: 'flex', gap: '8px', marginTop: '6px', flexWrap: 'wrap' }}>
+                <select 
+                  value={selectedApplication.status}
+                  onChange={(e) => {
+                    const newStatus = e.target.value;
+                    setSelectedApplication({...selectedApplication, status: newStatus});
+                  }}
+                  style={{ padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '13px', color: '#1a1f36', background: 'white', flex: 1, minWidth: '130px' }}
+                >
+                  <option value="PENDING">Pending</option>
+                  <option value="REVIEWING">Under Review</option>
+                  <option value="SHORTLISTED">Shortlisted</option>
+                  <option value="INTERVIEW_SCHEDULED">For Interview</option>
+                  <option value="HIRED">Hired</option>
+                  <option value="NOT_SELECTED">Not Selected</option>
+                  <option value="REJECTED">Rejected</option>
+                </select>
+                <button 
+                  onClick={() => {
+                    setPendingStatus(selectedApplication.status);
+                    setShowStatusConfirm(true);
+                  }}
+                  disabled={updatingStatus}
+                  style={{
+                    padding: '8px 16px',
+                    background: updatingStatus ? '#4338ca' : '#4F46E5',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: updatingStatus ? 'not-allowed' : 'pointer',
+                    fontWeight: '600',
+                    fontSize: '13px',
+                    transition: 'background 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    opacity: updatingStatus ? 0.7 : 1
+                  }}
+                  onMouseEnter={(e) => { if (!updatingStatus) e.currentTarget.style.background = '#4338ca'; }}
+                  onMouseLeave={(e) => { if (!updatingStatus) e.currentTarget.style.background = '#4F46E5'; }}
+                >
+                  {updatingStatus ? (<><span className="spinner" />Updating...</>) : ('Update')}
+                </button>
+              </div>
+            </div>
+           <div style={{ marginLeft: 'auto' }}>
+  <span className="detail-label">Applied Date</span>
+  <span className="detail-value">{formatDate(selectedApplication.applied_date)}</span>
+</div>
+          </div>
+        </div>
+
+        {/* ── ACTIONS ── */}
+        <div className="modal-actions" style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+          <button 
+            className="close-btn" 
+            onClick={() => setShowDetailsModal(false)}
+            style={{
+              flex: 1,
+              background: '#f1f5f9',
+              color: '#475569',
+              border: '1px solid #e2e8f0',
+              borderRadius: '8px',
+              padding: '12px',
+              cursor: 'pointer',
+              fontWeight: '600',
+              fontSize: '14px',
+              transition: 'background 0.2s ease'
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = '#e2e8f0'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = '#f1f5f9'; }}
+          >
+            Close
+          </button>
+          
+          {selectedApplication.status !== 'INTERVIEW_SCHEDULED' && (
+            <button 
+              className="schedule-btn" 
+              onClick={() => {
+                setPendingStatus('INTERVIEW_SCHEDULED');
+                setShowStatusConfirm(true);
+              }}
+              disabled={updatingStatus}
+              style={{
+                flex: 1,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '12px',
+                background: updatingStatus ? '#4338ca' : '#4F46E5',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: updatingStatus ? 'not-allowed' : 'pointer',
+                fontWeight: '600',
+                fontSize: '14px',
+                transition: 'background 0.2s ease',
+                opacity: updatingStatus ? 0.7 : 1
+              }}
+              onMouseEnter={(e) => { if (!updatingStatus) e.currentTarget.style.background = '#4338ca'; }}
+              onMouseLeave={(e) => { if (!updatingStatus) e.currentTarget.style.background = '#4F46E5'; }}
+            >
+              <img src={calendarminimalLogo} alt="Calendar" style={{ width: 16, height: 16, filter: 'brightness(0) saturate(100%) invert(100%) brightness(100%)' }} />
+              Schedule Interview
+            </button>
+          )}
+        </div>
+
+      </div>
+    </div>
+  </div>
+)}
 
       {/* COMPARE CANDIDATES MODAL */}
       {showCompareModal && selectedCompareCandidates.length === 2 && (

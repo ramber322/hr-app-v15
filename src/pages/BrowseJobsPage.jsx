@@ -1274,7 +1274,7 @@ const docsSubmitted = {
           color: '#4F46E5',
           maxWidth: '100%'
         }}>
-          <span>📄 {application.documents.transcript.name}</span>
+          <span> {application.documents.transcript.name}</span>
           <button
             type="button"
             onClick={() => handleRemoveFile('transcript')}
@@ -1361,7 +1361,7 @@ const docsSubmitted = {
           color: '#4F46E5',
           maxWidth: '100%'
         }}>
-          <span>📄 {application.documents.performanceRating.name}</span>
+          <span> {application.documents.performanceRating.name}</span>
           <button
             type="button"
             onClick={() => handleRemoveFile('performanceRating')}

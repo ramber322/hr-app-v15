@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from "../components/Navbar";
 import { supabase } from '../lib/supabase';
 import { PatternBackground } from '../components/PatternBackground';
+import '/src/styles/ApplicantProfilePage.css';
 import Loader from '../components/Loader';
 import { BasiconsDocumentIcon, CircularCheckSuccessIcon } from "../components/icons/CustomIcons";
 
@@ -711,7 +712,7 @@ if (!allowedTypes.includes(file.type)) {
                   <button className="cancel-btn" onClick={() => {
                     setIsEditing(false);
                     loadUserProfile();
-                  }}>Cancel</button>
+                  }} >Cancel</button>
                 </>
               )}
             </div>

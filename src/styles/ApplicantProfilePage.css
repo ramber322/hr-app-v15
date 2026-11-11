@@ -1,0 +1,21 @@
+.cancel-btn {
+  background: #e3e9ef !important;      /* Soft gray background */
+  color: #475569 !important;           /* Slate gray text */
+  border: 1px solid #e2e8f0 !important; /* Subtle gray border (locked) */
+  margin-left: 10px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.cancel-btn:hover {
+  background: #ccd6e3 !important;      /* Slightly darker gray on hover */
+  color: #1e293b !important;           /* Darker text on hover */
+  /* No border-color change */
+}
+
+.cancel-btn:active {
+  background: #cbd5e1 !important;      /* Even darker gray when clicked */
+}
