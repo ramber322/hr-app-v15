@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { supabase } from "../lib/supabase";
-import {ApplicantClockIcon, FireIcon, ApplicantNotesIcon, CalendarBookMarkIcon, ArrowRightIcon, ChevronRightIcon, AccountUserRoundIcon, HandshakeIcon, ApplicantClipboardIcon, NotificationIconApplicant, FeatherIcon, CheckInterviewIcon } from "../components/icons/CustomIcons";
+import {ApplicantClockIcon, CheckMarkSquareInterviewIcon, BasiconsBulbIcon, FireIcon, ApplicantNotesIcon, CalendarBookMarkIcon, ArrowRightIcon, ChevronRightIcon, AccountUserRoundIcon, HandshakeIcon, ApplicantClipboardIcon, NotificationIconApplicant, FeatherIcon, CheckInterviewIcon } from "../components/icons/CustomIcons";
 import locationLogo from '../assets/icon-location.png';
 import '/src/styles/DashboardApplicantPage.css';
 import mailBlackLogo from '../assets/mail-blue-icon.png';
@@ -789,7 +789,7 @@ export default function DashboardApplicant() {
                           color: '#166534',
                           fontWeight: 500
                         }}>
-                          ✅ You're ready to apply to jobs!
+                           You're ready to apply to jobs!
                           {optionalDone < optionalChecks.length && (
                             <div style={{ marginTop: '4px', fontWeight: 400, fontSize: '11px' }}>
                               Add optional docs to expand job eligibility.
@@ -1016,19 +1016,78 @@ borderBottom: '1px solid #bfdbfe',
             
 
             {/* Career Tips */}
-            <div className="dashboard-card">
-              <div className="card-header">
-                <h3>💡 Career Tips</h3>
-              </div>
-              <div className="card-body">
-                <ul style={{ paddingLeft: '20px', margin: 0, lineHeight: 1.9, fontSize: '13px', color: '#4a5568' }}>
-                  <li>Upload your PDS once — reuse it for every application</li>
-                  <li>Apply early — first applicants often get priority</li>
-                  <li>Review job qualifications before applying</li>
-                  <li>Check your email regularly for updates</li>
-                </ul>
-              </div>
-            </div>
+          {/* Career Tips */}
+<div className="dashboard-card">
+  <div className="card-header" style={{
+    background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+    borderBottom: '1px solid #bfdbfe',
+    padding: '16px 20px',
+    borderRadius: '12px 12px 0 0',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '12px'
+  }}>
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      minWidth: 0
+    }}>
+      {/* Icon Chip */}
+      <div style={{
+        width: '36px',
+        height: '36px',
+        borderRadius: '10px',
+        background: 'white',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+        boxShadow: '0 2px 6px rgba(79,70,229,0.12)'
+      }}>
+        {/* You can swap this for a custom Tip/Bulb icon if you have one */}
+        <BasiconsBulbIcon size={17} color="#1a3a5c" />
+      </div>
+      
+      {/* Text */}
+      <div>
+        <div style={{
+          fontSize: '11px',
+          fontWeight: 700,
+          color: '#1a3a5c',
+          letterSpacing: '1px',
+          textTransform: 'uppercase',
+          lineHeight: 1.2
+        }}>
+          Career Tips
+        </div>
+        <div style={{
+          fontSize: '12px',
+          color: '#6c757d',
+          marginTop: '2px'
+        }}>
+          Helpful advice for applicants
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="card-body">
+    <ul style={{ 
+      paddingLeft: '20px', 
+      margin: 0, 
+      lineHeight: 1.9, 
+      fontSize: '13px', 
+      color: '#4a5568' 
+    }}>
+      <li>Upload your PDS once — reuse it for every application</li>
+      <li>Apply early — first applicants often get priority</li>
+      <li>Review job qualifications before applying</li>
+      <li>Check your email regularly for updates</li>
+    </ul>
+  </div>
+</div>
 
           </div>
         </div>

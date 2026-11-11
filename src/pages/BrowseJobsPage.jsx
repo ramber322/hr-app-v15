@@ -849,65 +849,195 @@ const docsSubmitted = {
       {showJobDetailsModal && selectedJob && (
         <div className="modal-overlay" onClick={() => setShowJobDetailsModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{selectedJob.position_title}</h3>
-              <button className="close-modal" onClick={() => setShowJobDetailsModal(false)}>×</button>
+             {/* ── NEW HEADER ── */}
+      <div className="modal-header" style={{
+        background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+        borderBottom: '1px solid #bfdbfe',
+        borderRadius: '16px 16px 0 0',
+        padding: '20px 24px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '12px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{
+            width: '40px', height: '40px', borderRadius: '10px', background: 'white',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 2px 6px rgba(37,99,235,0.12)', flexShrink: 0
+          }}>
+            <span style={{ fontSize: '18px' }}>💼</span>
+          </div>
+          <div>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: '#1a3a5c', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '2px' }}>
+              Job Details
             </div>
-            <div className="modal-body">
-              <div className="detail-section">
-                <h4>Job Details</h4>
-                <div className="detail-grid">
-                  <div><span className="detail-label">Place of Assignment</span><span className="detail-value">{selectedJob.place_of_assignment}</span></div>
-                  <div><span className="detail-label">Item No.</span><span className="detail-value">{selectedJob.item_no}</span></div>
-                  <div><span className="detail-label">Salary Grade</span><span className="detail-value">{selectedJob.salary_grade}</span></div>
-                  <div><span className="detail-label">Monthly Salary</span><span className="detail-value">₱{selectedJob.monthly_salary?.toLocaleString()}</span></div>
-                  <div><span className="detail-label">Opening Date</span><span className="detail-value">{selectedJob.opening_date}</span></div>
-                  <div><span className="detail-label">Closing Date</span><span className="detail-value">{selectedJob.closing_date}</span></div>
-                </div>
-              </div>
+            <h2 style={{ margin: 0, fontSize: '18px', color: '#1a1f36', fontWeight: 700 }}>
+              {selectedJob.position_title}
+            </h2>
+          </div>
+        </div>
+        <button className="close-modal" onClick={() => setShowJobDetailsModal(false)}>×</button>
+      </div>
 
-              <div className="detail-section">
-                <h4>Qualifications</h4>
-                <div className="detail-grid">
-                  <div>
-                    <span className="detail-label">Education</span>
-                    <span className="detail-value">{getEducationLabel(selectedJob.qualifications?.education)}</span>
-                  </div>
-                  <div>
-                    <span className="detail-label">Eligibility</span>
-                    <span className="detail-value">{getEligibilityLabel(selectedJob.qualifications?.eligibility)}</span>
-                  </div>
-                  <div>
-                    <span className="detail-label">Training</span>
-                    <span className="detail-value">{getTrainingLabel(selectedJob.qualifications?.training)}</span>
-                  </div>
-                  <div>
-                    <span className="detail-label">Work Experience</span>
-                    <span className="detail-value">{getExperienceLabel(selectedJob.qualifications?.workExperience)}</span>
-                  </div>
-                </div>
-              </div>
+      <div className="modal-body">
 
-              <div className="detail-section">
-                <h4>Required Documents</h4>
-                <ul className="docs-list">
-                  <li>Personal Data Sheet (PDS)</li>
-                  {selectedJob.required_docs?.transcriptRecords && <li> Transcript of Records</li>}
-                  {selectedJob.required_docs?.performanceRating && <li> Performance Rating</li>}
-                </ul>
-              </div>
+        {/* ── JOB DETAILS ── */}
+        <div style={{ background: '#f8fafc', border: '1px solid #e8ebf5', borderRadius: '12px', padding: '18px 20px', marginBottom: '16px' }}>
+          <h4 style={{ fontSize: '12px', fontWeight: 700, color: '#1a3a5c', letterSpacing: '0.8px', textTransform: 'uppercase', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ color: '#4F46E5' }}>■</span> Job Details
+          </h4>
+          <div className="detail-grid">
+            <div>
+              <span className="detail-label">Place of Assignment</span>
+              <span className="detail-value">{selectedJob.place_of_assignment}</span>
+            </div>
+            <div>
+              <span className="detail-label">Item No.</span>
+              <span className="detail-value">{selectedJob.item_no}</span>
+            </div>
+            <div>
+              <span className="detail-label">Salary Grade</span>
+              <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: '#eef2ff', borderRadius: '6px', fontWeight: 700, color: '#1a3a5c' }}>
+                {selectedJob.salary_grade}
+              </span>
+            </div>
+            <div>
+              <span className="detail-label">Monthly Salary</span>
+              <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: '#eef2ff', borderRadius: '6px', fontWeight: 700, color: '#1a3a5c' }}>
+                ₱{selectedJob.monthly_salary?.toLocaleString()}
+              </span>
+            </div>
+            <div>
+              <span className="detail-label">Opening Date</span>
+              <span className="detail-value">{selectedJob.opening_date}</span>
+            </div>
+            <div>
+              <span className="detail-label">Closing Date</span>
+              <span className="detail-value">{selectedJob.closing_date}</span>
+            </div>
+          </div>
+        </div>
 
-              {selectedJob.instructions && (
-                <div className="detail-section">
-                  <h4>Instructions / Remarks</h4>
-                  <p style={{ fontSize: 14, lineHeight: 1.5, margin: 0 }}>{selectedJob.instructions}</p>
-                </div>
-              )}
+        {/* ── QUALIFICATIONS ── */}
+        <div style={{ background: '#f8fafc', border: '1px solid #e8ebf5', borderRadius: '12px', padding: '18px 20px', marginBottom: '16px' }}>
+          <h4 style={{ fontSize: '12px', fontWeight: 700, color: '#1a3a5c', letterSpacing: '0.8px', textTransform: 'uppercase', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ color: '#0d9488' }}>■</span> Qualifications
+          </h4>
+          <div className="detail-grid">
+            <div>
+              <span className="detail-label">Education</span>
+              <span className="detail-value">{getEducationLabel(selectedJob.qualifications?.education)}</span>
+            </div>
+            <div>
+              <span className="detail-label">Eligibility</span>
+              <span className="detail-value">{getEligibilityLabel(selectedJob.qualifications?.eligibility)}</span>
+            </div>
+            <div>
+              <span className="detail-label">Training</span>
+              <span className="detail-value">{getTrainingLabel(selectedJob.qualifications?.training)}</span>
+            </div>
+            <div>
+              <span className="detail-label">Work Experience</span>
+              <span className="detail-value">{getExperienceLabel(selectedJob.qualifications?.workExperience)}</span>
+            </div>
+          </div>
+        </div>
 
-              <hr />
+      {/* ── REQUIRED DOCUMENTS ── */}
+<div style={{ 
+  background: '#f8fafc', 
+  border: '1px solid #e8ebf5', 
+  borderRadius: '12px', 
+  padding: '18px 20px', 
+  marginBottom: '16px' 
+}}>
+  <h4 style={{ 
+    fontSize: '12px', 
+    fontWeight: 700, 
+    color: '#1a3a5c', 
+    letterSpacing: '0.8px', 
+    textTransform: 'uppercase', 
+    margin: '0 0 14px 0', 
+    display: 'flex', 
+    alignItems: 'center', 
+    gap: '10px' // Increased gap slightly for the dot
+  }}>
+    {/* ✅ The glowing dot replacing the square */}
+    <span style={{ 
+      width: '8px', 
+      height: '8px', 
+      borderRadius: '50%', 
+      background: '#f59e0b', // The solid orange color
+      boxShadow: '0 0 0 3px rgba(245, 158, 11, 0.15)', // The soft outer glow
+      flexShrink: 0 
+    }} /> 
+    Required Documents
+  </h4>
+  
+  <ul style={{ 
+    paddingLeft: '0', // Removed default padding
+    margin: 0, 
+    fontSize: '13px', 
+    color: '#1a1f36', 
+    lineHeight: 1.6,
+    listStyleType: 'none', // Removed default bullets
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px' // Spacing between items
+  }}>
+    {/* Using a nice checkmark icon instead of a dot for the list items */}
+    <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <span style={{ color: '#10b981', fontSize: '14px' }}>✓</span> 
+      Personal Data Sheet (PDS)
+    </li>
+    {selectedJob.required_docs?.transcriptRecords && (
+      <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span style={{ color: '#10b981', fontSize: '14px' }}>✓</span> 
+        Transcript of Records
+      </li>
+    )}
+    {selectedJob.required_docs?.performanceRating && (
+      <li style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span style={{ color: '#10b981', fontSize: '14px' }}>✓</span> 
+        Performance Rating
+      </li>
+    )}
+  </ul>
+</div>
 
-              <div className="detail-section">
-                <h4>Submit Your Application</h4>
+        {/* ── INSTRUCTIONS ── */}
+        {selectedJob.instructions && (
+          <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '12px', padding: '16px 20px', marginBottom: '16px' }}>
+            <h4 style={{ fontSize: '12px', fontWeight: 700, color: '#92400e', letterSpacing: '0.8px', textTransform: 'uppercase', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ color: '#f59e0b' }}>■</span> Instructions / Remarks
+            </h4>
+            <p style={{ fontSize: '13px', lineHeight: 1.6, margin: 0, color: '#78350f' }}>{selectedJob.instructions}</p>
+          </div>
+        )}
+
+              <hr style={{ border: 0, borderTop: '1px solid #e2e8f0', margin: '24px 0' }} />
+
+             <div style={{
+  background: '#f8fafc',
+  border: '1px solid #e8ebf5',
+  borderRadius: '12px',
+  padding: '18px 20px',
+  marginBottom: '16px'
+}}>
+  <h4 style={{
+    fontSize: '12px',
+    fontWeight: 700,
+    color: '#1a3a5c',
+    letterSpacing: '0.8px',
+    textTransform: 'uppercase',
+    margin: '0 0 14px 0',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px'
+  }}>
+    <span style={{ color: '#4F46E5' }}>■</span> Submit Your Application
+  </h4>
                 
                 {appliedJobs[selectedJob.id] ? (
                   // === ALREADY APPLIED VIEW ===
@@ -966,7 +1096,10 @@ const docsSubmitted = {
   border: application.documents.pds
     ? '1px solid #c7d2fe'
     : (applicantProfile?.pds_file_url ? '1px solid #d1fae5' : '1px solid #fecaca'),
-  marginBottom: '10px'
+  marginBottom: '10px',
+  
+  // ✅ ADDED SOFT DROP SHADOW HERE
+  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
 }}>
   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
     <span style={{ fontWeight: 600 }}>

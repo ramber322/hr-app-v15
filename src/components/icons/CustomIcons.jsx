@@ -2022,3 +2022,26 @@ export function BasiconsUserBookIcon({ size = 24, className = "", color = "curre
     </svg>
   );
 }
+
+
+export function BasiconsBulbIcon({ size = 24, className = "", color = "currentColor", style = {} }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      style={{ color, flexShrink: 0, ...style }}
+    >
+      <path
+        d="M9 23H15M8 20H16M17.0703 17C17.3501 16.0231 18.0066 15.2407 18.6665 14.4679C18.7878 14.3258 18.9013 14.1706 19 14C19.6807 12.8233 20 11.4571 20 10C20 5.58172 16.4183 2 12 2C7.58172 2 4 5.58172 4 10C4 11.4571 4.31932 12.8233 5 14C5.09091 14.1571 5.19433 14.3012 5.30489 14.4339C5.97776 15.2421 6.69657 16.0171 7.07026 17"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
