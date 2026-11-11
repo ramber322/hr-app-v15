@@ -8,6 +8,8 @@ import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import SendSmsTest from './pages/SendSmsTest';
 import EmailTest from './pages/EmailTest';
+import ZManual from './pages/ZManual';
+
 
 // HR Pages
 import DashboardPage from "./pages/DashboardPage";
@@ -102,6 +104,17 @@ function App() {
             </PublicRoute>
           } 
         />
+
+       
+        <Route 
+          path="/manual" 
+          element={
+              <ZManual />
+          }
+        />
+
+
+
 
         <Route 
           path="/test-sms" 
