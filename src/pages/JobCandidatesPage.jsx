@@ -6,7 +6,7 @@ import Navbar from "../components/Navbar";
 import { notifyStatusChange } from '../services/notificationService';
 import { supabase } from "../lib/supabase";
 import "../styles/JobCandidatesPage.css";
-import { DocumentCheckIcon, BasiconsUserBookIcon,BasiconsUserBoxIcon,  CircularCheckSuccessIcon, NewspaperIcon, CheckInterviewIconDashboard, CheckMarkSquareInterviewIcon,  PdfIcon, CheckboxMassIcon, ReverseTabArrowIcon, JusticePlumpIcon, CheckSquareIcon, MagnifyingGlassPlumpIcon } from "../components/icons/CustomIcons";
+import { DocumentCheckIcon, BasiconsPaperIcon, BasiconsEducationIcon, BasiconsBriefcaseIcon, BasiconsTodoListCheckIcon, BasiconsChartIcon, BasiconsTrainingHoursIcon, BasiconsUserBookIcon,BasiconsUserBoxIcon,  CircularCheckSuccessIcon, NewspaperIcon, CheckInterviewIconDashboard, CheckMarkSquareInterviewIcon,  PdfIcon, CheckboxMassIcon, ReverseTabArrowIcon, JusticePlumpIcon, CheckSquareIcon, MagnifyingGlassPlumpIcon } from "../components/icons/CustomIcons";
 import JobCandidateButton from "../components/JobCandidateButton";
 import communityLogo from '../assets/community3-icon.png';
 import calendarminimalLogo from '../assets/calendar-minimal-icon.png';
@@ -2185,338 +2185,518 @@ border: `1px solid ${isFit ? '#bbf7d0' : '#fde68a'}`
   </div>
 )}
 
+
+
       {/* COMPARE CANDIDATES MODAL */}
-      {showCompareModal && selectedCompareCandidates.length === 2 && (
-        <div className="modal-overlay" onClick={() => setShowCompareModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '900px' }}>
-            <div className="modal-header">
-              <h3 style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
-  <img 
-    src={compareplumpLogo} 
-    alt="compare" 
-    style={{ 
-      width: 26, 
-      height: 26,
-      filter: 'brightness(0) saturate(100%) invert(15%) sepia(60%) saturate(800%) hue-rotate(180deg) brightness(95%) contrast(90%)'
-    }} 
-  />
-  Compare Candidates
-</h3>
-              <button className="close-modal" onClick={() => setShowCompareModal(false)}>×</button>
-            </div>
-            <div className="modal-body">
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr>
-                      <th style={{ padding: '12px', textAlign: 'left', background: '#f8f9fa', borderBottom: '2px solid #e9ecef' }}>Criteria</th>
-                      <th style={{ padding: '12px', textAlign: 'center', background: '#f8f9fa', borderBottom: '2px solid #e9ecef', minWidth: '200px' }}>
-                        <div style={{ fontWeight: 'bold', color: '#1a1f36' }}>{selectedCompareCandidates[0].applicant_name}</div>
-                        <div style={{ fontSize: '14px', color: '#4f46e5' }}>Rank #{selectedCompareCandidates[0].rank} • {selectedCompareCandidates[0].ai_match_score}%</div>
-                      </th>
-                      <th style={{ padding: '12px', textAlign: 'center', background: '#f8f9fa', borderBottom: '2px solid #e9ecef', minWidth: '200px' }}>
-                        <div style={{ fontWeight: 'bold', color: '#1a1f36' }}>{selectedCompareCandidates[1].applicant_name}</div>
-                        <div style={{ fontSize: '14px', color: '#6c757d' }}>Rank #{selectedCompareCandidates[1].rank} • {selectedCompareCandidates[1].ai_match_score}%</div>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td style={{ padding: '10px 12px', fontWeight: '600', borderBottom: '1px solid #f0f0f0' }}>Score</td>
-                      <td style={{ padding: '10px 12px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
-                        <span style={{ 
-                          background: getScoreBg(selectedCompareCandidates[0].ai_match_score),
-                          color: getScoreColor(selectedCompareCandidates[0].ai_match_score),
-                          padding: '4px 12px',
-                          borderRadius: '20px',
-                          fontWeight: '600'
-                        }}>
-                          {selectedCompareCandidates[0].ai_match_score}%
-                        </span>
-                      </td>
-                      <td style={{ padding: '10px 12px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
-                        <span style={{ 
-                          background: getScoreBg(selectedCompareCandidates[1].ai_match_score),
-                          color: getScoreColor(selectedCompareCandidates[1].ai_match_score),
-                          padding: '4px 12px',
-                          borderRadius: '20px',
-                          fontWeight: '600'
-                        }}>
-                          {selectedCompareCandidates[1].ai_match_score}%
-                        </span>
-                      </td>
-                    </tr>
+     
+{/* CLOUD WHITE CANDIDATE COMPARISON MODAL */}
+{showCompareModal && selectedCompareCandidates.length === 2 && (
+  <div
+    className="cloud-compare-overlay"
+    onClick={() => setShowCompareModal(false)}
+  >
+    <div
+      className="cloud-compare-modal"
+      onClick={(e) => e.stopPropagation()}
+    >
 
-                    <tr>
-                      <td style={{ padding: '10px 12px', fontWeight: '600', borderBottom: '1px solid #f0f0f0' }}>Requirements Met</td>
-                      <td style={{ padding: '10px 12px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
-                        {selectedCompareCandidates[0].explanation?.requirements_met || '0/0'}
-                      </td>
-                      <td style={{ padding: '10px 12px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
-                        {selectedCompareCandidates[1].explanation?.requirements_met || '0/0'}
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td style={{ padding: '10px 12px', fontWeight: '600', borderBottom: '1px solid #f0f0f0' }}>Education</td>
-                      <td style={{ padding: '10px 12px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
-  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-    {cleanEducationText(selectedCompareCandidates[0].education)}
-    {(() => {
-      const edu = selectedCompareCandidates[0].education || '';
-      const eduLevels = ['None', 'Elementary', 'High School', '2-Year College', "Bachelor's", "Master's", "PhD/Doctorate"];
-      const actualLevel = eduLevels.indexOf(cleanEducationText(edu));
-      const requiredLevel = jobRequirements.education || 0;
-      if (requiredLevel === 0) return <span style={{ fontSize: '12px', color: '#6c757d' }}> (Not Required)</span>;
-      return actualLevel >= requiredLevel ? 
-        <CheckInterviewIconDashboard size={18} style={{ color: '#10b981' }} /> : 
-        <span style={{ color: '#dc2626', fontSize: '16px', marginLeft: '3px' }}>✕</span>;
-    })()}
-  </span>
-</td>
-
-                     <td style={{ padding: '10px 12px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
-  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-    {cleanEducationText(selectedCompareCandidates[1].education)}
-    {(() => {
-      const edu = selectedCompareCandidates[1].education || '';
-      const eduLevels = ['None', 'Elementary', 'High School', '2-Year College', "Bachelor's", "Master's", "PhD/Doctorate"];
-      const actualLevel = eduLevels.indexOf(cleanEducationText(edu));
-      const requiredLevel = jobRequirements.education || 0;
-      if (requiredLevel === 0) return <span style={{ fontSize: '12px', color: '#6c757d' }}> (Not Required)</span>;
-      return actualLevel >= requiredLevel ? 
-        <CheckInterviewIconDashboard size={18} style={{ color: '#10b981' }} /> : 
-        <span style={{ color: '#dc2626', fontSize: '16px', marginLeft: '3px' }}>✕</span>;
-    })()}
-  </span>
-</td>
-                    </tr>
-
-                    <tr>
-                      <td style={{ padding: '10px 12px', fontWeight: '600', borderBottom: '1px solid #f0f0f0' }}>Eligibility</td>
-                    <td style={{ padding: '10px 12px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
-  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-    {selectedCompareCandidates[0].eligibility !== 'None' ? `CS ${selectedCompareCandidates[0].eligibility}` : 'None Required'}
-    {(() => {
-      const actual = selectedCompareCandidates[0].eligibility || 'None';
-      const required = jobRequirements.eligibility;
-      if (!required || required === '' || required === 'None' || required === 'none' || required === 'null' || required === 'None Required') {
-        return <span style={{ fontSize: '12px', color: '#6c757d' }}> (Not Required)</span>;
-      }
-      return actual.toLowerCase() === required.toLowerCase() ? 
-        <CheckInterviewIconDashboard size={18} style={{ color: '#10b981' }} /> : 
-        <span style={{ color: '#dc2626', fontSize: '16px', marginLeft: '3px' }}>✕</span>;
-    })()}
-  </span>
-</td>
-
-<td style={{ padding: '10px 12px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
-  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-    {selectedCompareCandidates[1].eligibility !== 'None' ? `CS ${selectedCompareCandidates[1].eligibility}` : 'None Required'}
-    {(() => {
-      const actual = selectedCompareCandidates[1].eligibility || 'None';
-      const required = jobRequirements.eligibility;
-      if (!required || required === '' || required === 'None' || required === 'none' || required === 'null' || required === 'None Required') {
-        return <span style={{ fontSize: '12px', color: '#6c757d' }}> (Not Required)</span>;
-      }
-      return actual.toLowerCase() === required.toLowerCase() ? 
-        <CheckInterviewIconDashboard size={18} style={{ color: '#10b981' }} /> : 
-        <span style={{ color: '#dc2626', fontSize: '16px', marginLeft: '3px' }}>✕</span>;
-    })()}
-  </span>
-</td>
-                    </tr>
-
-                    <tr>
-                      <td style={{ padding: '10px 12px', fontWeight: '600', borderBottom: '1px solid #f0f0f0' }}>Training</td>
-                    <td style={{ padding: '10px 12px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
-  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-    {selectedCompareCandidates[0].training || 'N/A'}
-    {(() => {
-      const training = selectedCompareCandidates[0].training || '';
-      const match = training.match(/(\d+)\s*\/\s*(\d+)/);
-      if (match) {
-        const actual = parseInt(match[1]);
-        const required = parseInt(match[2]);
-        if (required === 0) return <span style={{ fontSize: '12px', color: '#6c757d' }}> (Not Required)</span>;
-        return actual >= required ? 
-          <CheckInterviewIconDashboard size={18} style={{ color: '#10b981' }} /> : 
-          <span style={{ color: '#dc2626', fontSize: '16px', marginLeft: '3px' }}>✕</span>;
-      }
-      return <span style={{ fontSize: '12px', color: '#6c757d' }}> (Not Required)</span>;
-    })()}
-  </span>
-</td>
-
-<td style={{ padding: '10px 12px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
-  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-    {selectedCompareCandidates[1].training || 'N/A'}
-    {(() => {
-      const training = selectedCompareCandidates[1].training || '';
-      const match = training.match(/(\d+)\s*\/\s*(\d+)/);
-      if (match) {
-        const actual = parseInt(match[1]);
-        const required = parseInt(match[2]);
-        if (required === 0) return <span style={{ fontSize: '12px', color: '#6c757d' }}> (Not Required)</span>;
-        return actual >= required ? 
-          <CheckInterviewIconDashboard size={18} style={{ color: '#10b981' }} /> : 
-          <span style={{ color: '#dc2626', fontSize: '16px', marginLeft: '3px' }}>✕</span>;
-      }
-      return <span style={{ fontSize: '12px', color: '#6c757d' }}> (Not Required)</span>;
-    })()}
-  </span>
-</td>
-                    </tr>
-
-                    <tr>
-                      <td style={{ padding: '10px 12px', fontWeight: '600', borderBottom: '1px solid #f0f0f0' }}>Experience</td>
-                     <td style={{ padding: '10px 12px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
-  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-    {selectedCompareCandidates[0].experience || 'N/A'}
-    {(() => {
-      const exp = selectedCompareCandidates[0].experience || '';
-      const match = exp.match(/(\d+)/);
-      if (match) {
-        const actual = parseInt(match[1]);
-        const required = jobRequirements.workExperience || 0;
-        if (required === 0) return <span style={{ fontSize: '12px', color: '#6c757d' }}> (Not Required)</span>;
-        return actual >= required ? 
-          <CheckInterviewIconDashboard size={18} style={{ color: '#10b981' }} /> : 
-          <span style={{ color: '#dc2626', fontSize: '16px', marginLeft: '3px' }}>✕</span>;
-      }
-      return <span style={{ fontSize: '12px', color: '#6c757d' }}> (Not Required)</span>;
-    })()}
-  </span>
-</td>
-
-<td style={{ padding: '10px 12px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
-  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-    {selectedCompareCandidates[1].experience || 'N/A'}
-    {(() => {
-      const exp = selectedCompareCandidates[1].experience || '';
-      const match = exp.match(/(\d+)/);
-      if (match) {
-        const actual = parseInt(match[1]);
-        const required = jobRequirements.workExperience || 0;
-        if (required === 0) return <span style={{ fontSize: '12px', color: '#6c757d' }}> (Not Required)</span>;
-        return actual >= required ? 
-          <CheckInterviewIconDashboard size={18} style={{ color: '#10b981' }} /> : 
-          <span style={{ color: '#dc2626', fontSize: '16px', marginLeft: '3px' }}>✕</span>;
-      }
-      return <span style={{ fontSize: '12px', color: '#6c757d' }}> (Not Required)</span>;
-    })()}
-  </span>
-</td>
-                    </tr>
-
-                    <tr>
-                      <td style={{ padding: '10px 12px', fontWeight: '600', borderBottom: '1px solid #f0f0f0' }}>Status</td>
-                      <td style={{ padding: '10px 12px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
-                        <span className="status-badge" style={{
-                          backgroundColor: getStatusColor(selectedCompareCandidates[0].status).bg,
-                          color: getStatusColor(selectedCompareCandidates[0].status).color,
-                          padding: '4px 12px',
-                          borderRadius: '20px',
-                          fontSize: '12px'
-                        }}>
-                          {getStatusColor(selectedCompareCandidates[0].status).label}
-                        </span>
-                      </td>
-                      <td style={{ padding: '10px 12px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
-                        <span className="status-badge" style={{
-                          backgroundColor: getStatusColor(selectedCompareCandidates[1].status).bg,
-                          color: getStatusColor(selectedCompareCandidates[1].status).color,
-                          padding: '4px 12px',
-                          borderRadius: '20px',
-                          fontSize: '12px'
-                        }}>
-                          {getStatusColor(selectedCompareCandidates[1].status).label}
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <div style={{ marginTop: '20px', padding: '16px', background: '#f8f9fa', borderRadius: '10px' }}>
-               <h4 style={{ 
-  margin: '0 0 8px 0', 
-  fontSize: '14px', 
-  color: '#1a1f36',
-  display: 'flex',
-  alignItems: 'center',
-  gap: '6px'
-}}>
-  <JusticePlumpIcon size={18} />
-  Quick Comparison Summary:
-</h4>
-                <div style={{ fontSize: '14px', color: '#4a5568', whiteSpace: 'pre-line' }}>
-                  {getComparisonSummary(selectedCompareCandidates[0], selectedCompareCandidates[1])}
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
-                <button className="close-btn" onClick={() => setShowCompareModal(false)} style={{ flex: 1, padding: '10px', background: 'white', border: '1px solid #dee2e6', borderRadius: '8px', cursor: 'pointer' }}>
-                  Close
-                </button>
-              </div>
-            </div>
+      {/* HEADER */}
+      <div className="cloud-compare-header">
+        <div className="cloud-header-title">
+          <div className="cloud-logo-box">
+            <img src={compareplumpLogo} alt="Compare" />
+          </div>
+          <div>
+            <h2>Candidate Comparison</h2>
+            <p>Side-by-side candidate evaluation</p>
           </div>
         </div>
-      )}
 
-
-      
-{/* Bulk Update Confirmation Modal */}
-{showBulkConfirmModal && (
-  <div className="modal-overlay" onClick={() => setShowBulkConfirmModal(false)}>
-    <div className="confirm-card" onClick={(e) => e.stopPropagation()}>
-      {/* Simple Header with Icon */}
-      <div className="confirm-card-header">
-        <span className="confirm-icon" style = {{marginBottom: '4px'}}><CheckMarkSquareInterviewIcon size={38}  color="#43ae4d"/></span>
-        <h3>Confirm Update</h3>
-      </div>
-      
-      {/* Message */}
-      <div className="confirm-card-body">
-        <p>
-          Are you sure you want to update <strong>{selectedRows.length}</strong> candidate(s) to:
-        </p>
-        <p style={{ 
-          fontWeight: '600', 
-          fontSize: '18px', 
-          color: '#1a1f36',
-          marginTop: '8px',
-          textTransform: 'capitalize'
-        }}>
-          {pendingBulkStatus}
-        </p>
-      </div>
-      
-      {/* Actions */}
-      <div className="confirm-card-footer" style={{ margin: '0 -24px -24px -24px', padding: '16px 24px', borderRadius: '0 0 12px 12px' }}>
-        <button 
-          className="btn-cancel"
-          onClick={() => setShowBulkConfirmModal(false)}
+        <button
+          className="cloud-close-btn"
+          onClick={() => setShowCompareModal(false)}
         >
-          Cancel
+          ×
         </button>
-        <button 
-          className="btn-confirm"
-          onClick={() => {
-            setShowBulkConfirmModal(false);
-            bulkUpdateStatus(pendingBulkStatus);
+      </div>
+
+      <div className="cloud-compare-body">
+
+        {/* CANDIDATE PROFILES */}
+        <div className="cloud-candidate-grid">
+
+          {selectedCompareCandidates.map((candidate, index) => {
+            const score = Number(candidate.ai_match_score) || 0;
+            const initials = String(candidate.applicant_name || '?')
+              .split(' ')
+              .filter(Boolean)
+              .slice(0, 2)
+              .map(name => name[0])
+              .join('')
+              .toUpperCase();
+
+            const firstScore =
+              Number(selectedCompareCandidates[0].ai_match_score) || 0;
+            const secondScore =
+              Number(selectedCompareCandidates[1].ai_match_score) || 0;
+
+            const isLeader = firstScore !== secondScore &&
+              score === Math.max(firstScore, secondScore);
+
+            return (
+              <div className="cloud-candidate-card" key={index}>
+
+                {isLeader && (
+                  <span className="cloud-leader-badge">
+                    ★ Higher Match
+                  </span>
+                )}
+
+                <div className="cloud-profile-content">
+                  <div className={`cloud-avatar cloud-avatar-${index}`}>
+                    {initials}
+                  </div>
+
+                  <div className="cloud-candidate-details">
+                    <h3>{candidate.applicant_name}</h3>
+                    <span>Candidate Rank #{candidate.rank}</span>
+                  </div>
+                </div>
+
+                <div className="cloud-score-area">
+                  <div className="cloud-score-top">
+                    <span>Candidate Score</span>
+           <strong
+  style={{
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '5px 13px',
+    borderRadius: '8px',
+    fontSize: '15px',
+    fontWeight: 650,
+    fontFamily: "'Inter', 'Segoe UI', sans-serif",
+    letterSpacing: '-0.3px',
+    color: getScoreColor(candidate.ai_match_score),
+    background: getScoreBg(candidate.ai_match_score),
+    minWidth: '62px'
+  }}
+>
+  {candidate.ai_match_score}%
+</strong>
+                  </div>
+
+                  <div className="cloud-progress">
+  <div
+    className="cloud-progress-fill"
+    style={{
+      width: `${Math.min(100, Math.max(0, score))}%`,
+      background:
+        score >= 80 ? '#10b981' :   // green — strong
+        score >= 60 ? '#f59e0b' :   // amber — moderate
+        '#ef4444',                   // red — low
+      transition: 'width 0.4s ease, background 0.3s ease'
+    }}
+  />
+</div>
+                </div>
+
+                <div className="cloud-profile-bottom">
+  <span>Application Status</span>
+
+  <span
+    className="cloud-status"
+    style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '6px',
+      padding: '6px 13px',
+      borderRadius: '50px',
+      backgroundColor: getStatusColor(candidate.status).bg,
+      color: getStatusColor(candidate.status).color,
+      fontSize: '11px',
+      fontWeight: 600,
+      letterSpacing: '0.2px',
+      whiteSpace: 'nowrap',
+      border: `1px solid ${getStatusColor(candidate.status).color}20`
+    }}
+  >
+    <span
+      style={{
+        width: '6px',
+        height: '6px',
+        borderRadius: '50%',
+        backgroundColor: getStatusColor(candidate.status).color
+      }}
+    />
+    {getStatusColor(candidate.status).label}
+  </span>
+</div>
+
+              </div>
+            );
+          })}
+
+        </div>
+
+        {/* COMPARISON TABLE */}
+        <div className="cloud-section-heading">
+          <div>
+            <h3>Requirements Comparison</h3>
+            <p>Compare qualifications and job requirements</p>
+          </div>
+          <span className="cloud-section-icon">
+  <JusticePlumpIcon size={16} color="#3e3c6d" />
+</span>
+        </div>
+
+        <div className="cloud-table-container">
+          <table className="cloud-compare-table">
+            <thead>
+              <tr>
+                <th>Criteria</th>
+                <th>{selectedCompareCandidates[0].applicant_name}</th>
+                <th>{selectedCompareCandidates[1].applicant_name}</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              {/* SCORE */}
+<tr>
+  <td>
+  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+    <BasiconsChartIcon size={16} color="#8B5CF6" />
+    Match Score
+  </div>
+</td>
+  {selectedCompareCandidates.map((candidate, i) => (
+    <td key={i}>
+   <span
+  style={{
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '5px 14px',
+    borderRadius: '999px',              /* ✅ Perfect pill shape */
+    fontSize: '13px',
+    fontWeight: 600,
+    fontFamily: "'Inter', 'Segoe UI', sans-serif",
+    letterSpacing: '-0.2px',
+    color: getScoreColor(candidate.ai_match_score),
+    backgroundColor: getScoreBg(candidate.ai_match_score),
+    minWidth: '60px',
+    lineHeight: 1.2,
+  }}
+>
+  {candidate.ai_match_score}%
+</span>
+    </td>
+  ))}
+</tr>
+
+              {/* REQUIREMENTS MET */}
+              <tr>
+                <td>
+  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+    <CheckInterviewIconDashboard size={16} color="#10b981" />
+    Requirements Met
+  </div>
+</td>
+                {selectedCompareCandidates.map((candidate, i) => (
+                  <td key={i}>
+                    <strong>
+                      {candidate.explanation?.requirements_met || '0/0'}
+                    </strong>
+                  </td>
+                ))}
+              </tr>
+
+              {/* EDUCATION */}
+              <tr>
+                <td>
+  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+    <BasiconsEducationIcon size={16} color="#72302a" />
+    Education
+  </div>
+</td>
+                {selectedCompareCandidates.map((candidate, i) => {
+                  const levels = [
+                    'None',
+                    'Elementary',
+                    'High School',
+                    '2-Year College',
+                    "Bachelor's",
+                    "Master's",
+                    'PhD/Doctorate'
+                  ];
+
+                  const actual = levels.indexOf(
+                    cleanEducationText(candidate.education)
+                  );
+                  const required = Number(jobRequirements.education) || 0;
+
+                  const match = required === 0
+                    ? null
+                    : actual >= required;
+
+                  return (
+                    <td key={i}>
+                      <div className="cloud-value-stack">
+                        <strong>
+                          {cleanEducationText(candidate.education)}
+                        </strong>
+                        {match === null
+                          ? <span className="cloud-na">Not Required</span>
+                          : match
+                            ? <span className="cloud-pass" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><CheckInterviewIconDashboard size={14} color="#10b981" /> Meets requirement</span>
+                            : <span className="cloud-fail">✕ Below requirement</span>
+                        }
+                      </div>
+                    </td>
+                  );
+                })}
+              </tr>
+
+              {/* ELIGIBILITY */}
+              <tr>
+                <td>
+  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+    <BasiconsPaperIcon size={16} color="#0EA5E9" />
+    Eligibility
+  </div>
+</td>
+                {selectedCompareCandidates.map((candidate, i) => {
+                  const actual = candidate.eligibility || 'None';
+                  const required = jobRequirements.eligibility;
+
+                  const notRequired = !required ||
+                    ['none', 'null', 'none required'].includes(
+                      String(required).toLowerCase()
+                    );
+
+                  const match = notRequired
+                    ? null
+                    : actual.toLowerCase() === String(required).toLowerCase();
+
+                  return (
+                    <td key={i}>
+                      <div className="cloud-value-stack">
+                        <strong>
+                          {actual !== 'None' ? `CS ${actual}` : 'None Required'}
+                        </strong>
+                        {match === null
+                          ? <span className="cloud-na">Not Required</span>
+                          : match
+                            ? <span className="cloud-pass" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><CheckInterviewIconDashboard size={14} color="#10b981" /> Meets requirement</span>
+                            : <span className="cloud-fail">✕ Below requirement</span>
+                        }
+                      </div>
+                    </td>
+                  );
+                })}
+              </tr>
+
+              {/* TRAINING */}
+              <tr>
+                <td>
+  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+    <BasiconsTrainingHoursIcon size={16} color="#F59E0B" />
+    Training
+  </div>
+</td>
+                {selectedCompareCandidates.map((candidate, i) => {
+                  const training = String(candidate.training || '');
+                  const match = training.match(/(\d+)\s*\/\s*(\d+)/);
+
+                  let result = null;
+
+                  if (match && Number(match[2]) !== 0) {
+                    result = Number(match[1]) >= Number(match[2]);
+                  }
+
+                  return (
+                    <td key={i}>
+                      <div className="cloud-value-stack">
+                        <strong>{candidate.training || 'N/A'}</strong>
+                        {result === null
+                          ? <span className="cloud-na">Not Required / N/A</span>
+                          : result
+                            ? <span className="cloud-pass" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><CheckInterviewIconDashboard size={14} color="#10b981" /> Meets requirement</span>
+                            : <span className="cloud-fail">✕ Below requirement</span>
+                        }
+                      </div>
+                    </td>
+                  );
+                })}
+              </tr>
+
+              {/* EXPERIENCE */}
+              <tr>
+                <td>
+  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+    <BasiconsBriefcaseIcon size={16} color="#10B981" />
+    Experience
+  </div>
+</td>
+                {selectedCompareCandidates.map((candidate, i) => {
+                  const exp = String(candidate.experience || '');
+                  const match = exp.match(/(\d+)/);
+                  const required = Number(jobRequirements.workExperience) || 0;
+
+                  let result = null;
+
+                  if (match && required > 0) {
+                    result = Number(match[1]) >= required;
+                  }
+
+                  return (
+                    <td key={i}>
+                      <div className="cloud-value-stack">
+                        <strong>{candidate.experience || 'N/A'}</strong>
+                        {result === null
+                          ? <span className="cloud-na">Not Required / N/A</span>
+                          : result
+                            ? <span className="cloud-pass" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><CheckInterviewIconDashboard size={14} color="#10b981" /> Meets requirement</span>
+                            : <span className="cloud-fail">✕ Below requirement</span>
+                        }
+                      </div>
+                    </td>
+                  );
+                })}
+              </tr>
+
+             {/* STATUS */}
+<tr>
+ <td>
+  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+    {/* ✅ 16px wrapper to match the width of the other icons */}
+    <div style={{ 
+      width: '16px', 
+      height: '16px', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      flexShrink: 0 
+    }}>
+      <span style={{ 
+        width: '8px', 
+        height: '8px', 
+        borderRadius: '50%', 
+        background: '#6366f1', 
+        boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.15)'
+      }} />
+    </div>
+    Status
+  </div>
+</td>
+  {selectedCompareCandidates.map((candidate, i) => {
+    const status = getStatusColor(candidate.status);
+
+    return (
+      <td key={i}>
+        <span
+          className="cloud-status"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '7px',
+            padding: '6px 13px',
+            borderRadius: '50px',
+            backgroundColor: status.bg,
+            color: status.color,
+            border: `1px solid ${status.color}25`,
+            fontSize: '11px',
+            fontWeight: 600,
+            letterSpacing: '0.2px',
+            whiteSpace: 'nowrap'
           }}
-          style={{ background: '#0d9488', transition: 'background 0.2s ease' }}
-           onMouseEnter={(e) => e.currentTarget.style.background = '#0f766e'}
-  onMouseLeave={(e) => e.currentTarget.style.background = '#0d9488'}
         >
-          Confirm
+          <span
+            style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              backgroundColor: status.color,
+              flexShrink: 0
+            }}
+          />
+          {status.label}
+        </span>
+      </td>
+    );
+  })}
+</tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        {/* SCORE DIFFERENCE */}
+        <div className="cloud-difference-card">
+          <div className="cloud-difference-icon">
+            <span>✧</span>
+          </div>
+          <div>
+            <h4>Match Score Overview</h4>
+            <p>
+              {Number(selectedCompareCandidates[0].ai_match_score) ===
+               Number(selectedCompareCandidates[1].ai_match_score)
+                ? 'Both candidates have equal AI match scores.'
+                : `${selectedCompareCandidates[
+                    Number(selectedCompareCandidates[0].ai_match_score) >
+                    Number(selectedCompareCandidates[1].ai_match_score)
+                      ? 0 : 1
+                  ].applicant_name} has a ${
+                    Math.abs(
+                      Number(selectedCompareCandidates[0].ai_match_score) -
+                      Number(selectedCompareCandidates[1].ai_match_score)
+                    )
+                  } percentage-point higher AI match score.`
+              }
+            </p>
+          </div>
+        </div>
+
+        {/* AI SUMMARY */}
+        <div className="cloud-ai-card">
+          <div className="cloud-ai-header">
+            <div className="cloud-ai-icon"><JusticePlumpIcon size={20} color="#3e3c6d" /></div>
+            <div>
+              <h3>Quick Comparison Summary</h3>
+              <p>Automated candidate comparison summary</p>
+            </div>
+            <span className="cloud-ai-label">INSIGHTS</span>
+          </div>
+
+          <div className="cloud-ai-content">
+            {getComparisonSummary(
+              selectedCompareCandidates[0],
+              selectedCompareCandidates[1]
+            )}
+          </div>
+        </div>
+
+      </div>
+
+      {/* FOOTER */}
+      <div className="cloud-compare-footer">
+        <span>Candidate Evaluation Dashboard</span>
+
+        <button
+          onClick={() => setShowCompareModal(false)}
+          className="cloud-done-btn"
+        >
+          Close Comparison
         </button>
       </div>
+
     </div>
   </div>
 )}
+
 
 
 {/* Status Update Success Notification */}

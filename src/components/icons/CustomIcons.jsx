@@ -2108,3 +2108,44 @@ export function BasiconsUserBoxIcon({ size = 24, className = "", color = "curren
     </svg>
   );
 }
+
+
+export function BasiconsEducationIcon({ size = 24, className = "", color = "currentColor", style = {} }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} style={{ color, flexShrink: 0, ...style }}>
+      <path d="M19 11.2035V16.0416L12 20L5 16.0416V11.2035M21.9 13.0117V17.3122M1 9.24873L11.5081 4.1135C11.8177 3.96217 12.1823 3.96217 12.4919 4.1135L23 9.24873L12.4919 14.384C12.1823 14.5353 11.8177 14.5353 11.5081 14.384L1 9.24873Z" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function BasiconsPaperIcon({ size = 24, className = "", color = "currentColor", style = {} }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} style={{ color, flexShrink: 0, ...style }}>
+      <path d="M8 6H16M8 10H16M8 14H11M6 22H18C19.1046 22 20 21.1046 20 20V4C20 2.89543 19.1046 2 18 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22Z" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function BasiconsTrainingHoursIcon({ size = 24, className = "", color = "currentColor", style = {} }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} style={{ color, flexShrink: 0, ...style }}>
+      <path d="M13 2.04938C12.6711 2.01672 12.3375 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 11.6625 21.9833 11.3289 21.9506 11M16 8V5L19 2L20.125 3.875L22 5L19 8H16ZM16 8L12 12M12 14C10.8954 14 10 13.1046 10 12C10 10.8954 10.8954 10 12 10C13.1046 10 14 10.8954 14 12C14 13.1046 13.1046 14 12 14Z" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function BasiconsTodoListCheckIcon({ size = 24, className = "", color = "currentColor", style = {} }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} style={{ color, flexShrink: 0, ...style }}>
+      <path d="M9.5 6H21.5M9.5 12H21.5M9.5 18H21.5M2 6L3.30628 7.30628C3.41599 7.41599 3.59127 7.42394 3.71047 7.32461L6.5 5M3.5 11H5.5V13H3.5V11ZM3.5 17H5.5V19H3.5V17Z" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function BasiconsChartIcon({ size = 24, className = "", color = "currentColor", style = {} }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 256 256" fill="none" className={className} style={{ color, flexShrink: 0, ...style }}>
+      <path d="M224,200h-8V40a8,8,0,0,0-8-8H152a8,8,0,0,0-8,8V80H96a8,8,0,0,0-8,8v40H48a8,8,0,0,0-8,8v64H32a8,8,0,0,0,0,16H224a8,8,0,0,0,0-16ZM160,48h40V200H160ZM104,96h40V200H104ZM56,144H88v56H56Z" fill={color} />
+    </svg>
+  );
+}
